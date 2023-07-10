@@ -1,0 +1,29 @@
+Package: nbbSTSestimate
+Type: Package
+Title: Time series estimation by State Space models (incl. low frequency input)
+Version: 1.0.0
+Authors@R: 
+    person(given = "Corentin",
+           family = "Lemasson",
+           role = c("aut", "cre"),
+           email = "corentin.lemasson@nbb.be")
+Description: Interface around 'JDemetra+ 3.x' sa-toolkit 
+             (<https://github.com/jdemetra/jdemetra-core>), STACE project.
+             It performs in-sample imputation of missing values, as well as
+             for-now- and back-casting of univariate time series by integrating 
+             (or not) low-frequency input.
+Depends:
+  R (>= 3.6.0)
+Imports:
+  data.table,
+  readxl,
+  openxlsx,
+  zoo,
+  rjd3toolkit (>= 3.0.0),
+  rjd3tramoseats (>= 3.0.0),
+  rjd3sts (>= 0.9.2)
+License: EUPL
+Encoding: UTF-8
+Collate: 'main_functions.R' 'utility_functions.R' 'output.R'
+NeedsCompilation: no
+RoxygenNote: 7.2.3
