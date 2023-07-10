@@ -40,7 +40,7 @@ rslt2 <- estimateSTS(x, x.lf, stsmodel = "bsm",
 ### 2) input in Excel
 ``` r
 # Examples
-## Fill structured .xlsx file with your input. See template or vignette (in the vignette map) for the structure of the Excel file
+## Fill structured .xlsx file with your input. See template or vignette for the structure of the Excel file
 res<-estimateSTS_fromXLSX(path.data = "input_to_R.xlsx",
                           is.lf = TRUE,
                           conversion = "Sum",
