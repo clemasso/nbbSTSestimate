@@ -1,5 +1,5 @@
 # nbbSTSestimate
-Mixed-frequency imputation of missing values, back-casting and forecasting of univariate time series
+Multi-processing time series imputation by State Space models (incl. low frequency input)
 
 ## Description
 Performs in-sample imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating  (or not) low-frequency input.
