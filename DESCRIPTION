@@ -1,17 +1,13 @@
 Package: nbbSTSestimate
 Type: Package
-Title: Time series estimation by State Space models (incl. low frequency input)
-Version: 1.0.0
+Title: Multi-processing time series estimation by State Space models (incl. low frequency input)
+Version: 1.0.1
 Authors@R: 
     person(given = "Corentin",
            family = "Lemasson",
            role = c("aut", "cre"),
            email = "corentin.lemasson@nbb.be")
-Description: Interface around 'JDemetra+ 3.x' sa-toolkit 
-             (<https://github.com/jdemetra/jdemetra-core>), STACE project.
-             It performs in-sample imputation of missing values, as well as
-             for-now- and back-casting of univariate time series by integrating 
-             (or not) low-frequency input.
+Description: Performs imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating (or not) low-frequency input. A combination of common structural models and the use of "cumulators" can be used for this purpose.
 Depends:
   R (>= 3.6.0)
 Imports:
@@ -27,3 +23,7 @@ Encoding: UTF-8
 Collate: 'main_functions.R' 'utility_functions.R' 'output.R'
 NeedsCompilation: no
 RoxygenNote: 7.2.3
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

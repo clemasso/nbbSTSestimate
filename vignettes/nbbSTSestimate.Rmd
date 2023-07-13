@@ -1,0 +1,223 @@
+---
+title: "Multi-processing time series estimation by State Space models"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Time series estimation by State Space models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+author: Corentin Lemasson
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The production of official statistics at an early stage requires to solve many statistical issues with a certain degree of flexibility that may be difficult to address with traditional models. Mixed-frequency state space models constitute a versatile framework to formalize them. We build the package *nbbSTSestimate* based on the package *rjd3sts*, which offers an interface in R to the part of JDemetra+ dedicated to State Space models. The package *nbbSTSestimate* performs multi-processing in-sample imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating (or not) low-frequency input. Common structural models can be used for this purpose. Treatment of outliers and calendar effects are integrated. Automatic procedures for model selection, outlier detection and insertion of calendar effects are included. The tool currently handles monthly, quarterly and annual data with or without low-frequency input. Mixed-frequency are handled by the use of "cumulators".
+
+# Quick start
+
+Install and load package
+```{r, eval=FALSE}
+install.packages("nbbSTSestimate")
+library(nbbSTSestimate)
+```
+
+Then,
+
+ 1. Prepare input either directly in R or in an structured Excel (.xlsx) file. The structure of the input in R is explained in details in the documentation of the main function (see ?estimateSTS) and in the section related to the description of the functions below. For the Excel file, a template is provided. The content of each sheet is also described in the section related to the description of the functions below. 
+ 2. Run main function and stock the results into a variable
+ 3. Check results
+
+```{r, eval=FALSE}
+# Example
+
+## Step 1: prepare input
+retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores, 
+                      BookStores=rjd3toolkit::retail$BookStores, 
+                      ShoeStores=rjd3toolkit::retail$ShoeStores)
+
+x<-window(retail_extract, c(1990,1), c(2012,6), extend = TRUE)
+x.lf<-ts(rbind(matrix(c(325000,330000,7800,8000,17500,18000), nrow = 2, byrow = FALSE),
+         aggregate.ts(retail_extract, nfreq = 1),
+         matrix(c(525000,15000,27000), nrow = 1)), start = c(1990,1), frequency = 1)
+outliers_input<-data.frame(series_name=c("GroceryStores", "GroceryStores", "BookStores", "ShoeStores"),
+                           outliers=c("LS_2008M12", "AO_2002M04", "auto", "auto"))
+
+## Step 2: run main function
+rslt <- estimateSTS(x, x.lf, stsmodel = "bsm", 
+                 outliers = "userdefined",
+                 outliers.df = outliers_input,
+                 cal.effect = "auto",
+                 cal.effect.td = "BE",
+                 cal.effect.easter = TRUE)
+## Step 3: check results
+plot(rslt)
+#rslt$...
+```
+
+
+# Description of the functions
+
+To list the functions available in the package; 
+```{r, eval=FALSE}
+ls("package:nbbSTSestimate")
+```
+
+Use help('name of the functions') or ?'name of the functions' for more information and examples over the function. 
+
+## estimateSTS()
+
+The function **estimateSTS()** performs multi-processing in-sample imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating (or not) low-frequency input. Currently, the user can model the series using a few common structural model. There is also an automatic procedure for model selection. In addition, the model can be enriched with outliers and calendar effects which are defined either by the user or by an automatic procedure. 
+
+```{r, eval = FALSE}
+# Call
+estimateSTS(
+  x,
+  x.lf = NULL,
+  stsmodel = c("auto", "bsm", "llt", "ll", "noise", "mixed"),
+  stsmodel.df = NULL,
+  outliers = c("auto", "none", "userdefined"),
+  outliers.df = NULL,
+  cal.effect = c("auto", "none", "forced", "mixed"),
+  cal.effect.td = c("Default", "WesternEU", "BE", "none"),
+  cal.effect.easter = TRUE,
+  cal.effect.df = NULL,
+  conversion = c("Sum", "Average"),
+  path.xlsx = NULL
+)
+```
+
+See below for explanations on the use of each argument. See ?estimateSTS for details and examples on how to define the various arguments in practice. 
+
+### Series
+
+Include a (set of) high frequency series to impute and, optionally, a (set of) additional low frequency input. Monthly, quarterly and annual data are handled for the high frequency series. Quarterly and annual data are possible for the low frequency input.
+
+Related arguments: *x* and *x.lf*
+
+### Model
+
+Currently, only structural models can be fitted to the high frequency data. It can be a basic structural model ('bsm'), a local linear trend model ('llt'), a local level model ('ll') or just a trivial noise model ('noise'). An automatic model selection can be used by selecting the option 'auto', which is the default option. Note that if one of the above options is defined in the *stsmodel* argument, it will be used for all series in the dataset. The last option 'mixed' allows the user to attribute a different model (including 'auto') for each series individually that can be defined via the argument *stsmodel.df*.
+
+Related arguments: *stsmodel* and *stsmodel.df*
+
+### Outliers
+
+The automatic procedure for outlier detection is performed by using the function *tramo_outliers()* from the package 'rjd3tramoseats'. Alternatively, we could choose not to define any outlier for one or more series but this option should be used with care as structural models, like any linear model, are sensitive to undetected outliers which could result to poor imputation. Similarly to the definition of the models, the two options 'auto' and 'none' in the argument *outliers* can be used if we want to apply to same treatment for all series. Set this argument to 'userdefined' for a specific treatment by series and/or to define the outliers manually for some or all series. This can be done via the argument *outliers.df*.
+
+Related arguments: *outliers* and *outliers.df*
+
+### Calendar effects
+
+An automatic detection of calendar effects can be performed. The procedure includes the use of specific functions from the package 'rjd3toolkit' and tests of significativity on the parameters. When the automatic procedure is selected, it was chosen not to detect any calendar effect for quarterly series. Thus, the automatic procedure will only detect potential calendar effects in monthly series. The user has currently the choice between a few default calendars and whether to consider easter effect. Finally, as for the model and the outliers, the user should set the argument *cal.effect* equals to "mixed" in order to be able to specify different setting for each series individually by using the argument *cal.effect.df*.   
+
+Related arguments: *cal.effect*, *cal.effect.td*, *cal.effect.easter* and *cal.effect.df*
+
+### Conversion
+
+The type of consistency to consider between the high frequency series and the low frequency series if any. 'Sum' and 'Average' consistency are currently handled.
+
+Related argument: *conversion*
+
+### Output
+
+In addition to the output automatically returned by the function, the user can mention the path of an .xlsx file to create that will contain the imputed series.
+
+Related argument: *path.xlsx*
+
+
+## estimateSTS_fromXLSX()
+
+The function **estimateSTS_fromXLSX()** is the same as **estimateSTS()**, but all the input come from an Excel file (.xlsx).
+
+```{r, eval = FALSE}
+# Call
+estimateSTS_fromXLSX(
+  path.data,
+  is.lf = TRUE,
+  conversion = c("Sum", "Average"),
+  path.output = NULL
+)
+```
+
+See below for explanations on the use of each argument and the structure of the Excel file. See ?estimateSTS_fromXLSX for details and examples on how to define the various arguments in practice. 
+
+### Input
+
+The Excel file (.xlsx) must be composed of five sheets called 'x', 'x.lf', 'stsmodel', 'outliers' and 'cal.effect'. Here is a template for each sheet:
+
+- x
+
+| date        | seriesname1   | seriesname2   | ...         |
+| ----------- | -----------   | -----------   | ----------- |
+| 01/01/1992  | (blank)       | 790           | ...         |
+| 01/02/1992  | (blank)       | 540           | ...         |
+| ...         | ...           | ...           | ...         |
+
+In the Excel file, leave blank the periods to be impute.
+
+- x.lf
+
+| date        | seriesname1   | seriesname2   | ...         |
+| ----------- | -----------   | -----------   | ----------- |
+| 01/01/1992  | 325000        | (blank)       | ...         |
+| 01/01/1993  | 330000        | 8000          | ...         |
+| ...         | ...           | ...           | ...         |
+
+It is quite flexible here. For the case when there is no value to impute in the high frequency series during a given low frequency period, you can either mention the value at that period or not. It is only important to mention the estimate of the low-frequency period if it is available and if it corresponds to some periods to impute in the high frequency data. When no low-frequency estimate is available for a series, you can either keep it in the dataset (with all blanks or only known values) or remove it. What is important is that the name of the series (when the series is present) matches this in the high frequency data.
+
+- stsmodel
+
+| series_name  | stsmodel      | 
+| ------------ | -----------   | 
+| seriesname1  | auto          | 
+| seriesname2  | llt           | 
+| ...          | ...           | 
+
+- outliers
+
+| series_name  | outliers      | 
+| ------------ | -----------   | 
+| seriesname1  | LS_2008M12    | 
+| seriesname1  | AO_2002M04    | 
+| seriesname2  | auto          | 
+| ...          | ...           | 
+
+To define manual outliers, it must start with the outlier type, followed by an underscore and the period. The period must start with the year YYYY (only this for annual data), then 'Q' for quarterly data or 'M' for monthly data, and the quarter and/or month. e.g. AO_2015Q1, LS_2009M05, TC_2020M12.
+
+- cal.effect
+
+| series_name  | cal.effect    | cal.effect.td | cal.effect.easter |
+| ------------ | -----------   | -----------   | ----------- |
+| seriesname1  | auto          | WesternEU     | FALSE       |
+| seriesname2  | none          | Default       | TRUE        |
+| ...          | ...           | ...           | ...         |
+
+Related argument: *path.data* (=the path to the excel file containing the input) and *is.lf* which is a boolean parameter to indicate whether low frequency input should be considered for some series.
+
+### Conversion
+
+The type of consistency to consider between the high frequency series and the low frequency series if any. 'Sum' and 'Average' consistency are currently handled.
+
+Related argument: *conversion*
+
+### Output
+
+In addition to the output automatically returned by the function, the user can mention the path of an .xlsx file to create that will contain the imputed series. Note that the usual functions *print()*, *summary()* and *plot()* can be applied on the output of the function. The latter is particularly useful to quickly visualize the estimates for the imputed periods.
+
+Related argument: *path.output*
+
+
+# Description of the output
+
+The output of the function estimateSTS() and estimateSTS_fromXLSX() is an object of class 'nbb.estimateSTS.output' which contain many information intended to help the user evaluate the quality of the results and take informed decision concerning the specifications of the model for each series. 
+
+The output includes, for each series, a table with the imputed high frequency series and their estimated components (seasonal, trend, irregular), information about regressors (outliers and calendar effects) and residuals (including diagnostic tests), etc. 
+
+Finally, the usual functions **print()**, **summary()** and **plot()** can be applied on the output of the functions estimateSTS() and estimateSTS_fromXLSX(). The plot() function is particularly useful to quickly visualize the estimates for the imputed periods.
+
