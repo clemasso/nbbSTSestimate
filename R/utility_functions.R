@@ -34,21 +34,21 @@ check_stsmodel <- function(x, stsmodel){
 # Check that 'stsmodel.df' is filled in properly when stsmodel = "mixed"
 handle_stsmodel_df <- function (x, stsmodel.df){
   if(!is.data.frame(stsmodel.df)){
-    stop("Since you mentionned stsmodel = 'mixed', you must provide the stsmodel of the series as a data.frame in 'stsmodel.df'. 
+    stop("Since you mentionned stsmodel = 'mixed', you must provide the stsmodel of the series as a data.frame in 'stsmodel.df'.
          The stsmodel.df should contain two columns: the first one called 'series_name' and the second one called 'stsmodel'.
          The stsmodel for each series must be a valid model choosen in the list of models authorized in 'stsmodel' (including 'auto').")
   }else{
     if(all(colnames(stsmodel.df) %in% c("series_name", "stsmodel"))){
       ## convert columns to character
       stsmodel.df<-data.frame(lapply(stsmodel.df, as.character), stringsAsFactors=FALSE)
-      
+
       ## check if the stsmodel is valid
       for(i in 1:nrow(stsmodel.df)){
         if(!stsmodel.df[i,2] %in% c("auto", "bsm", "llt", "ll", "noise")){
           stsmodel.df[i,2]<-"auto"
           warning(paste0(stsmodel.df[i,1], ": the stsmodel submitted for this series is not valid. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise."), call. = FALSE)
         }
-        
+
         if(frequency(x) == 1){
           if(stsmodel.df[i,2] == "bsm"){
             stsmodel.df[i,2]<-"auto"
@@ -56,7 +56,7 @@ handle_stsmodel_df <- function (x, stsmodel.df){
           }
         }
       }
-      
+
       ## check duplicates in series name
       series_names<-stsmodel.df$series_name
       if (length(series_names) != length(unique(series_names))){
@@ -67,15 +67,15 @@ handle_stsmodel_df <- function (x, stsmodel.df){
       ## series name in stsmodel.df but not in the data
       for(s in series_names){
         if(!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input.")) 
+          stop(paste0("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input."))
         }
       }
-      ## series name in the data but not in stsmodel.df 
+      ## series name in the data but not in stsmodel.df
       x_series_names<-colnames(x)[-1]
       for(s in x_series_names){
         if(!s %in% series_names){
           stsmodel.df<-rbind(stsmodel.df, c(s, "auto"))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE) 
+          warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE)
         }
       }
     }else{
@@ -87,33 +87,33 @@ handle_stsmodel_df <- function (x, stsmodel.df){
 
 # Handle outliers data to create a list of IV variables (or 'auto')
 handle_outliers_data <- function(x, outliers.data){
-  
+
   if(is.vector(outliers.data)){
     if(is.null(ncol(x))){
       n<-1
     }
   }else{
     if(!is.data.frame(outliers.data)){
-      stop("Since you mentionned outliers = 'userdefined', you must provide the outliers as a data.frame in 'outliers.data'. 
+      stop("Since you mentionned outliers = 'userdefined', you must provide the outliers as a data.frame in 'outliers.data'.
          The outliers should contain two columns: the first one called 'series_name' and the second one called 'outliers'.
          The outliers should be mentionned in a specific format (e.g. AO_2020Q2, AO_2020M4) or they can be defined as 'auto'.")
     }else{
       if(all(colnames(outliers.data) %in% c("series_name", "outliers"))){
         outliers.data<-data.frame(lapply(outliers.data, as.character), stringsAsFactors=FALSE)
         series_names<-outliers.data$series_name
-        
+
         ## series name in outliers.data but not in the data
         for(s in series_names){
           if(!s %in% colnames(x)){
-            stop(paste0("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input.")) 
+            stop(paste0("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input."))
           }
         }
-        ## series name in the data but not in outliers.data 
+        ## series name in the data but not in outliers.data
         x_series_names<-colnames(x)[-1]
         for(s in x_series_names){
           if(!s %in% series_names){
             outliers.data<-rbind(outliers.data, c(s, "auto"))
-            warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE) 
+            warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE)
           }
         }
       }else{
@@ -122,11 +122,11 @@ handle_outliers_data <- function(x, outliers.data){
     }
     n<-length(series_names)
   }
- 
+
   iv_list<-list() # initialization output
-  
+
   for(j in 1:n){
-  
+
     if(is.data.frame(outliers.data)){
       series_name<-series_names[j]
       xj<-x[,series_name]
@@ -136,46 +136,46 @@ handle_outliers_data <- function(x, outliers.data){
       xj<-x
       outliers<-outliers.data
     }
-    
+
     if(any(outliers == "auto")){
       iv_list[[j]]<-"auto"
       names(iv_list)[j] <- series_name
     }else{
       type<-substr(outliers,1,2)
-      
+
       for(t in type){
         if(!t %in% c('AO','LS','TC','SO')){
-          stop(paste0(t, " is not a proper type of outliers. Only AO, LS, TC and SO are handled.")) 
+          stop(paste0(t, " is not a proper type of outliers. Only AO, LS, TC and SO are handled."))
         }
       }
-      
+
       yr<-substr(outliers,4,7)
       per<-substr(outliers,9,10)
-      
+
       for(i in 1:length(yr)){
         yri<-as.numeric(yr[i])
         peri<-as.numeric(per[i])
-        
+
         if(is.na(yri)){stop(paste0(yri, " is not a proper year in outliers definition."))}
         if(is.na(peri)){stop(paste0(peri, " is not a proper quarter or month in outliers definition."))}
-        
+
         if(yri<start(x)[1] | yri>end(x)[1] | (yri==start(x)[1] & peri<start(x)[2]) | (yri==end(x)[1] & peri>end(x)[2])) {
           stop(paste0("The outlier ", outliers[i], " is outside the range of the series."))
         }
       }
-      
+
       freq_outliers<-substr(outliers,8,8)
       if(frequency(x)==4){
         if(!all(freq_outliers=="Q")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
       }else if(frequency(x)==12){
         if(!all(freq_outliers=="M")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
       }
-      
+
       for(i in 1:length(outliers)){
-        
+
         outlier_decimal<-decimal_period(as.numeric(yr[i]),as.numeric(per[i]),frequency(x))
         pos<-which(time(x) == outlier_decimal)
-        
+
         if(type[i]=='AO'){
           iv<-ao_variable(s=xj, pos=pos)
         } else if(type[i]=='LS'){
@@ -185,14 +185,14 @@ handle_outliers_data <- function(x, outliers.data){
         } else if(type[i]=='SO'){
           iv<-so_variable(s=xj, pos=pos)
         }
-        
+
         if(i==1){
           ivs<-matrix(iv,ncol=1)
         }else{
           ivs<-cbind(ivs,iv)
         }
       }
-      
+
       ivs<-ts(ivs, start = start(x), frequency = frequency(x))
       colnames(ivs)<-outliers
       iv_list[[j]]<-ivs
@@ -205,18 +205,18 @@ handle_outliers_data <- function(x, outliers.data){
 # Check that 'cal.effect.df' is filled in properly when cal.effect = "mixed"
 handle_cal_effect_df <- function (x, cal.effect.df){
   if(!is.data.frame(cal.effect.df)){
-    stop("Since you mentionned cal.effect = 'mixed', you must provide the way to handle calendar effect for each series as a data.frame in 'cal.effect.df'. 
+    stop("Since you mentionned cal.effect = 'mixed', you must provide the way to handle calendar effect for each series as a data.frame in 'cal.effect.df'.
          The cal.effect.df should contain four columns called 'series_name', 'cal.effect', 'cal.effect.td' and 'cal.effect.easter'.
          The three last columns must constitute valid options for each series, taken in the list of authorized options in 'cal.effect','cal.effect.td' and 'cal.effect.easter'.")
   }else{
     if(all(colnames(cal.effect.df) %in% c("series_name", "cal.effect", "cal.effect.td", "cal.effect.easter"))){
       ## convert columns to character
       cal.effect.df<-data.frame(lapply(cal.effect.df, as.character), stringsAsFactors=FALSE)
-      
+
       ## check column content
       if(!all(cal.effect.df$cal.effect.td %in% c("Default", "WesternEU", "BE", "none"))) stop("Invalid calendar(s) in 'cal.effect.df'. Please check your input.")
       if(any(is.na((as.logical(cal.effect.df$cal.effect.easter))))) stop("Invalid argument in 'cal.effect.df' for the easter effect. Must be TRUE or FALSE for each series. Please check your input.")
-      
+
       ## check duplicates in series name
       series_names<-cal.effect.df$series_name
       if (length(series_names) != length(unique(series_names))){
@@ -227,15 +227,15 @@ handle_cal_effect_df <- function (x, cal.effect.df){
       ## series name in cal.effect.df but not in the data
       for(s in series_names){
         if(!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input.")) 
+          stop(paste0("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input."))
         }
       }
-      ## series name in the data but not in cal.effect.df 
+      ## series name in the data but not in cal.effect.df
       x_series_names<-colnames(x)[-1]
       for(s in x_series_names){
         if(!s %in% series_names){
           cal.effect.df<-rbind(cal.effect.df, c(s, "auto", "Default", TRUE))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE) 
+          warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE)
         }
       }
     }else{
@@ -264,7 +264,7 @@ check_cal.effect <- function(x, cal.effect){
 # Create time group variable for cumulative sum
 create_time_gvar <- function(x, freq){
   yr<-floor(time(x))
-  
+
   if(freq==1){
     gvar<-yr
   }else if (freq==4){
@@ -298,14 +298,14 @@ ma <- function (x, order, centre = TRUE){
 
 # Determine whether there is seasonality in a series
 is_seasonal <- function(x){
-  
+
   if(frequency(x)>1){
-    
+
     x_diff<-diff(x)
     qs_pval<-try(seasonality_qs(x_diff,frequency(x))$pvalue, silent=TRUE) # Ljung-Box
     f_pval<-try(seasonality_f(x_diff, frequency(x))$pvalue, silent=TRUE) # F-test on seasonal dummies
     friedman_pval<-try(seasonality_friedman(x_diff,frequency(x))$pvalue, silent=TRUE) # Friedman non-parametric test
-    
+
     test_succeeded<-c(!"try-error" %in% class(qs_pval), !"try-error" %in% class(f_pval), !"try-error" %in% class(friedman_pval))
     if(all(test_succeeded)){
       pvals<-c(qs_pval, f_pval, friedman_pval)
@@ -329,7 +329,7 @@ is_seasonal <- function(x){
 
 # Calendar variables
 create_htdreg <- function(x, type = c("Default", "WesternEU", "BE")){
-  
+
   if(type == "Default"){
     x_calendar<-national_calendar(list())
   }else if(type == "BE"){
@@ -355,10 +355,10 @@ create_htdreg <- function(x, type = c("Default", "WesternEU", "BE")){
       special_day("ALLSAINTSDAY"),
       special_day("CHRISTMAS")))
   }
-  
+
   htdreg<-calendar_td(x_calendar,s=x)
   colnames(htdreg)<-c("Mon","Tue","Wed","Thu","Fri","Sat")
-  
+
   return(htdreg)
 }
 
@@ -371,9 +371,9 @@ create_easterreg <- function(x){
 
 # Test easter effect
 easter_f<-function(x, easter.reg, regressors){
-  
+
   regall<-cbind(easter.reg,regressors)
-  
+
   model<-model()
   add(model, locallineartrend("trend"))
   add(model, seasonal("seas", frequency(x)))
@@ -386,33 +386,33 @@ easter_f<-function(x, easter.reg, regressors){
   add_equation(eq, "reg")
   add(model, eq)
   res<-estimate(model, x)
-  
+
   if(frequency(x) == 4){
     pos_easter<-7
   }else if(frequency(x) == 12){
     pos_easter<-15
   }
-  
+
   easter_est<-smoothed_states(res)[1,pos_easter]
   easter_est_sd<-smoothed_states_stdev(res)[1,pos_easter]
-  
+
   t<-easter_est/easter_est_sd
-  
+
   n<-length(x)
   k<-length(result(res,"parameters"))
   pval<-pt(abs(t), df = n-k+1,lower.tail = FALSE)*2 # two-tailed test
-  
+
   return(list(value = t, pvalue = pval))
 }
 
 # Run structural model by State Space
 sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FALSE, cumulator.ratio = NA, regressors = NULL){
-  
+
   # 1. Create the model and the equation
   model<-model()
   eq<-equation("eq")
-  
-  # 2. Create the components 
+
+  # 2. Create the components
   noise<-noise("noise")
   if(stsmodel == 'bsm'){
     trend<-locallineartrend("trend")
@@ -425,38 +425,38 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
   if(!is.null(regressors)){
     reg<-reg("iv", regressors)
   }
-  
+
   # 3. Add the components to the model and create the equation
   if(cumulator){
     if(stsmodel == 'bsm'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, seas, noise, reg))
       }else{
-        all<-aggregation("m", list(trend, seas, noise))  
+        all<-aggregation("m", list(trend, seas, noise))
       }
     }else if(stsmodel == 'llt'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, noise, reg))
       }else{
-        all<-aggregation("m", list(trend, noise))  
+        all<-aggregation("m", list(trend, noise))
       }
     }else if(stsmodel == 'll'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, noise, reg))
       }else{
-        all<-aggregation("m", list(trend, noise))  
+        all<-aggregation("m", list(trend, noise))
       }
     }else if(stsmodel == 'noise'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(noise, reg))
       }else{
-        all<-noise  
+        all<-noise
       }
     }
     c<-cumul("c", all, period = cumulator.ratio)
     add(model, c)
     add_equation(eq, "c")
-    
+
   }else{
     if(stsmodel == 'bsm'){
       add(model, trend)
@@ -495,70 +495,70 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
         add_equation(eq, "iv")
       }
     }
-  } 
-  
+  }
+
   # 4. Estimate the model
   add(model, eq)
   res<-estimate(model, x)
-  
+
   # 5. Output
-  
+
   ## 5.1. Main results
   table_est<-get_table_est(res, stsmodel, cumulator, regressors, x)
   regressors_est<-get_regressors_est(res, stsmodel, cumulator, regressors)
-  
+
   ## 5.2 Parameters
   sf<-result(res, "scalingfactor")
-  param<-result(res, "parameters") * sf 
+  param<-result(res, "parameters") * sf
   names(param)<-result(res, "parametersnames")
-  
+
   ## 5.3. Residuals & diagnostics
   vtilt<-result(res,"likelihood.residuals")
   vtilt_statistics <- perform_diagnostic_tests(vtilt, frequency = frequency(x))
   residuals_out<-list(residuals = vtilt, statistics = vtilt_statistics)
-  
+
   ## 5.4. Likelihood
   likelihood=list(ll=result(res, "likelihood.ll"), ser=result(res,"likelihood.ser"))
-  
+
   ## 5.5. Variance of the slope component (used for test of specification)
   vslope<-getvslope(res, stsmodel)
-  
+
   output<-list(table=table_est, regressors=regressors_est, hparam=param, residuals=residuals_out, likelihood=likelihood, stsmodel=stsmodel, vslope=vslope)
-  
+
   return(output)
 }
 
 # Get output related to the different components of the series
 get_table_est <- function(results, stsmodel, cumulator, regressors, x){
-  
+
   ## Estimates of smoothed states
   smoothed_states<-data.frame(result(results,"ssf.smoothing.states"))
-  
+
   ## Number of regressors and their names
   if(!is.null(regressors)){
     reg_names<-colnames(regressors)
     nreg<-length(reg_names)
   }
-  
+
   ## Extract components
-  
+
   ### Component's estimates without regressors
-  
+
   ### NOTE: in smoothed_states with cumulator (without cumulator, there is no cumulated results and all the other columns are shifted left):
   ###       BSM: V1=cumulated resuls, V2=trend, V3=slope, V4-V6=seasonal (Q) V4-V14 (M), V7=irregular V15 (M), V8+=regressors V16+ (M)
   ###       Local Linear Trend: V1=cumulated resuls, V2=trend, V3=slope, V4=irregular, V5+=regressors
   ###       Local Level: V1=cumulated resuls, V2=trend, V3=irregular, V4+=regressors
   ###       Noise: V1=cumulated resuls, V2=irregular, V3+=regressor
-  
+
   if(stsmodel == "bsm"){
     pos_trend<-fifelse(cumulator,2,1)
     pos_slope<-pos_trend+1
     pos_seasonal<-pos_trend+2
-    
+
     trend<-smoothed_states[,pos_trend]
     slope<-smoothed_states[,pos_slope]
     seasonal<-smoothed_states[,pos_seasonal]
-    
+
     if(frequency(x) == 4){
       pos_irregular<-pos_trend+5
     }else if(frequency(x) == 12){
@@ -568,35 +568,35 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
   }else if(stsmodel == "llt"){
     pos_trend<-fifelse(cumulator,2,1)
     pos_slope<-pos_trend+1
-    
+
     trend<-smoothed_states[,pos_trend]
     slope<-smoothed_states[,pos_slope]
     seasonal<-numeric(nrow(smoothed_states))
-    
+
     pos_irregular<-pos_trend+2
     irregular<-smoothed_states[,pos_irregular]
   }else if(stsmodel == "ll"){
     pos_trend<-fifelse(cumulator,2,1)
-    
+
     trend<-smoothed_states[,pos_trend]
     slope<-numeric(nrow(smoothed_states))
     seasonal<-numeric(nrow(smoothed_states))
-    
+
     pos_irregular<-pos_trend+1
     irregular<-smoothed_states[,pos_irregular]
   }else if(stsmodel == "noise"){
     trend<-numeric(nrow(smoothed_states))
     slope<-numeric(nrow(smoothed_states))
     seasonal<-numeric(nrow(smoothed_states))
-    
+
     pos_irregular<-fifelse(cumulator,2,1)
     irregular<-smoothed_states[,pos_irregular]
   }
-  
+
   ### Add regressors effect if any
   if(!is.null(regressors)){
     smoothed_states_ext<-cbind(smoothed_states,as.data.frame(regressors))
-    
+
     for (i in 1:nreg){
       ### regression type
       if(toupper(substr(reg_names[i],1,2)) %in% c("AO","LS","TC","SO")){
@@ -606,10 +606,10 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
       }else{
         reg_type<-"undefined"
       }
-      
+
       # regression effect
       regi<-smoothed_states_ext[,pos_irregular+i]*smoothed_states_ext[,pos_irregular+i+nreg]
-      
+
       # add regression effect to the right component
       if (reg_type %in% c("LS","TC")){
         trend <- trend + regi
@@ -620,24 +620,24 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
       }
     }
   }
-  
+
   ## Final table
   series <- trend + seasonal + irregular
   table_mat <- cbind(series, trend, slope, seasonal, irregular)
   table_ts <- ts(table_mat, start = start(x), frequency = frequency(x))
   colnames(table_ts)<-c("Series", "Trend", "Slope", "Seasonal", "Irregular")
-  
+
   return(table_ts)
 }
 
 # Get output related to regressors
 get_regressors_est <- function(results, stsmodel, cumulator, regressors){
-  
+
   if(!is.null(regressors)){
     ## smoothed states estimates and their variance
     smoothing_states_est<-result(results,"ssf.smoothing.states")
     smoothing_vstates_est<-result(results,"ssf.smoothing.vstates")
-    
+
     ## positions of regressors in the states
     if(stsmodel == "bsm"){
       if(frequency(regressors) == 4){
@@ -646,51 +646,51 @@ get_regressors_est <- function(results, stsmodel, cumulator, regressors){
         fc_cumulator<- 16
       }
     }
-    
+
     switch(stsmodel,
            "bsm" = {fc <- fifelse(cumulator,fc_cumulator,fc_cumulator-1)},
            "llt" = {fc <- fifelse(cumulator,5,4)},
            "ll" = {fc <- fifelse(cumulator,4,3)},
            "noise" = {fc <- fifelse(cumulator,3,2)})
-    
+
     lc<-ncol(smoothing_states_est)
-    
+
     ## output
     b_reg<-smoothing_states_est[1,fc:lc]
     b_vreg<-smoothing_vstates_est[1,fc:lc]
     t<-b_reg/sqrt(b_vreg)
     names(b_reg)<-names(b_vreg)<-names(t)<-colnames(regressors)
-    
+
     regressors_est <- list(regressors = regressors, param = b_reg, vparam = b_vreg, tstat = t)
   }else{
     regressors_est <- NULL
   }
-  
+
   return(regressors_est)
 }
 
 # Perform diagnostic tests
 perform_diagnostic_tests <- function(x, frequency){
-  
+
   # Normality
   dh<-doornikhansen(x)
   pval_norm<-get_pvalue_test(list(doornik_hansen=dh))
-  
+
   # Autocorrelation
-  lj<-ljungbox(x, k=frequency*2, mean=F)
+  lj<-ljungbox(x, k=frequency*2, mean=FALSE)
   pval_ac<-get_pvalue_test(list(lj))
   rownames(pval_ac)<-paste0("ljungbox_residuals_", frequency*2)
-  
+
   # Randomness
   runs<-testofruns(x)
   udr<-testofupdownruns(x)
   pval_rand<-get_pvalue_test(list(runs_around_mean=runs, up_and_down_runs=udr))
-  
+
   # Linearity
   ljsq<-ljungbox(x^2, k=frequency*2)
   pval_lin<-get_pvalue_test(list(ljsq))
   rownames(pval_lin)<-paste0("ljungbox_squaredresiduals_", frequency*2)
-  
+
   return(list(normality = pval_norm, autocorrelations = pval_ac, randomness = pval_rand, linearity = pval_lin))
 }
 
@@ -720,9 +720,9 @@ is_nonsignificant_iv <- function(results){
   t<-results$regressors$tstat
   t_outliers<-t[substr(names(t),1,2) %in% c("AO","LS","TC","SO")]
   t_outliers_ns<-t_outliers[abs(t_outliers)<1.96]
-  
+
   include_nonsignificant_iv<-fifelse(length(t_outliers_ns) > 0, TRUE, FALSE)
-  
+
   return(include_nonsignificant_iv)
 }
 
@@ -756,9 +756,9 @@ clean_iv <- function(x, stsmodel, cumulator, cumulator.ratio, regressors, t_reg)
 
 # Determine whether there should be a slope component in the trend of a seasonality adjusted series
 is_slope <- function(x, cumulator, cumulator.ratio, regressors){
-  
+
   res_llt<-try(sts.run(x, stsmodel = "llt", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
-  
+
   if(!"try-error" %in% class(res_llt)) {
     constant_slope<-fifelse(var(res_llt$table[,"Slope"]) == 0,TRUE,FALSE)
     if(constant_slope){
@@ -778,17 +778,17 @@ is_slope <- function(x, cumulator, cumulator.ratio, regressors){
   }else{
     include_slope<-FALSE
   }
-  
-  return(include_slope)  
+
+  return(include_slope)
 }
 
 # Determine whether there should be a trend (and a slope component) in a seasonality adjusted series
 is_trend <- function(x, cumulator, cumulator.ratio, regressors){
-  
+
   res_llt<-try(sts.run(x, stsmodel = "llt", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
   res_ll<-try(sts.run(x, stsmodel = "ll", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
   res_noise<-try(sts.run(x, stsmodel = "noise", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
-  
+
   test_succeeded<-c(!"try-error" %in% class(res_llt), !"try-error" %in% class(res_ll), !"try-error" %in% class(res_noise))
   if(all(test_succeeded)){
     ser_llt<-res_llt$likelihood$ser
@@ -814,4 +814,3 @@ is_trend <- function(x, cumulator, cumulator.ratio, regressors){
   }
   return(include_trend)
 }
-
