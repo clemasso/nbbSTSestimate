@@ -108,10 +108,12 @@ an object of class "nbb.estimateSTS.output"
 \description{
 The package performs in-sample imputation of missing values, as well as
 for-now- and back-casting of univariate time series by integrating (or not)
-low-frequency input. Common structural models can be used for this purpose.
-Treatment of outliers and calendar effects are integrated. The tool includes
-automatic procedures for model selection, outlier detection and insertion of
-calendar effects.
+low-frequency input. A combination of common structural models and the use of
+"cumulators" can be used for this purpose. Treatment of outliers and calendar
+effects are integrated. The tool includes automatic procedures for model
+selection, outlier detection and insertion of calendar effects.  Currently
+monthly, quarterly and annual data are handled with or without low-frequency
+input.
 }
 \examples{
 retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores, 
