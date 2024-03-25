@@ -1,31 +1,42 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # nbbSTSestimate
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-Multiprocessing time series imputation by State Space models (incl. low
-frequency input)
+Multiprocessing time series imputation by State Space models (incl. low frequency input)
+
 
 ## Description
+Performs in-sample imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating  (or not) low-frequency input.
 
-Performs in-sample imputation of missing values, as well as for-now- and
-back-casting of univariate time series by integrating (or not)
-low-frequency input.
 
 ## Installation
 
-``` r
+```{r, echo = TRUE, eval = FALSE}
 remotes::install_github("clemasso/nbbSTSestimate")
 ```
+
 
 ## Usage (2 possibilites)
 
 ### 1) Input in R
 
-``` r
+```{r, echo = TRUE, eval = TRUE}
 library("nbbSTSestimate")
 
 # Examples
@@ -46,9 +57,7 @@ rslt1 <- estimateSTS(x, x.lf) # auto procedures for model selection, outlier det
 plot(rslt1,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
-
-``` r
+```{r, echo = TRUE, eval = TRUE}
 library("nbbSTSestimate")
 
 ## Adding specific input
@@ -66,15 +75,12 @@ rslt2 <- estimateSTS(
     cal.effect.td = "BE",
     cal.effect.easter = TRUE
 )
-#> Warning: GroceryStores: Some specified outliers are not significant.
 plot(rslt2,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-
 ### 2) Input in Excel
 
-``` r
+```{r, echo = TRUE, eval = FALSE}
 # Examples
 ## Fill structured .xlsx file with your input. See template or vignette for the structure of the Excel file
 res <- estimateSTS_fromXLSX(
@@ -85,12 +91,11 @@ res <- estimateSTS_fromXLSX(
 )
 ```
 
+
 ## Contributing
 
-Any contribution is welcome and should be done through pull requests
-and/or issues.
+Any contribution is welcome and should be done through pull requests and/or issues.
 
 ## Licensing
 
-The code of this project is licensed under the [European Union Public
-Licence (EUPL)](https://joinup.ec.europa.eu/page/eupl-text-11-12).
+The code of this project is licensed under the [European Union Public Licence (EUPL)](https://joinup.ec.europa.eu/page/eupl-text-11-12).

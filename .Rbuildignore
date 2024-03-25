@@ -1,2 +1,5 @@
 ^nbbSTSestimate\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^LICENSE$
+^README\.Rmd$
