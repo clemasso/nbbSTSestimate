@@ -12,5 +12,3 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [1.0.1] - 2023-07-13
 
 [1.0.1]: https://github.com/clemasso/nbbSTSestimate/releases/tag/v1.0.1
-
-## First commit
