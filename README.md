@@ -46,7 +46,7 @@ rslt1 <- estimateSTS(x, x.lf) # auto procedures for model selection, outlier det
 plot(rslt1,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" />
 
 ``` r
 library("nbbSTSestimate")
@@ -70,7 +70,7 @@ rslt2 <- estimateSTS(
 plot(rslt2,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" />
 
 ### 2) Input in Excel
 
