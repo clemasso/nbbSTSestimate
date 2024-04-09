@@ -85,10 +85,12 @@ res <- estimateSTS_fromXLSX(
 )
 ```
 
-## Contributing
+## Package Maintenance and contributing
 
 Any contribution is welcome and should be done through pull requests
-and/or issues.
+and/or issues. pull requests should include **updated tests** and
+**updated documentation**. If functionality is changed, docstrings
+should be added or updated.
 
 ## Licensing
 

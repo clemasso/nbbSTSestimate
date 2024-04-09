@@ -132,7 +132,7 @@ estimateSTS <- function(x,
   stsmodel<-match.arg(stsmodel)
   if(stsmodel == "mixed"){
     stsmodel_df<-handle_stsmodel_df(x, stsmodel.df)
-  }else{
+  } else{
     stsmodel<-check_stsmodel(x, stsmodel)
   }
   outliers<-match.arg(outliers)
@@ -142,7 +142,7 @@ estimateSTS <- function(x,
   cal.effect<-match.arg(cal.effect)
   if(cal.effect == "mixed"){
     cal_effect_df<-handle_cal_effect_df(x, cal.effect.df)
-  }else{
+  } else{
     cal.effect<-check_cal.effect(x, cal.effect)
   }
   cal.effect.td<-match.arg(cal.effect.td)
@@ -163,7 +163,7 @@ estimateSTS <- function(x,
   if(is.null(ncol(x))){
     nr<-length(x)
     nc<-1
-  }else{
+  } else{
     nr<-nrow(x)
     nc<-ncol(x)
   }
@@ -184,15 +184,15 @@ estimateSTS <- function(x,
       namei<-fifelse(is.null(names(x)), "series", "names(x)")
       xi<-x
       xi_lf<-x.lf
-    }else{
+    } else{
       xi<-x[,i]
       namei<-colnames(x)[i]
       if(is.null(x.lf)){
         xi_lf<-NULL
-      }else{
+      } else{
         if(colnames(x)[i] %in% colnames(x.lf)){
           xi_lf<-x.lf[,colnames(x)[i]]
-        }else{
+        } else{
           xi_lf<-NULL
         }
       }
@@ -271,7 +271,7 @@ estimateSTS <- function(x,
       cumulator<-TRUE
       ratio_hflf<-freq/freq_lf
       
-    }else{
+    } else{
       xi_run<- xi
       cumulator<-FALSE
       ratio_hflf<-NA
@@ -288,22 +288,22 @@ estimateSTS <- function(x,
     if(auto_model){
       if(is_seasonal(xi)){
         stsmodel_selected<-"bsm"
-      }else{
+      } else{
         xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values
         if(!"try-error" %in% class(xi_fill)) {
           d<-as.numeric(differencing_fast(xi_fill, freq, mad = TRUE)$differences["order",1])
           if(d == 0){
             stsmodel_selected<-"noise"
-          }else if(d == 1){
+          } else if(d == 1){
             stsmodel_selected<-"ll"
-          }else if(d > 1){
+          } else if(d > 1){
             stsmodel_selected<-"llt"
           }
-        }else{
+        } else{
           stsmodel_selected<-"ll"
         }
       }
-    }else{
+    } else{
       stsmodel_selected<-stsmodel
     }  
     
@@ -318,7 +318,7 @@ estimateSTS <- function(x,
       if(!"try-error" %in% class(res_outliers)) {
         iv<-res_outliers$X
         if(ncol(iv) == 0) iv<-NULL
-      }else{
+      } else{
         if(!exists("xi_fill")) xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values if too many of them
         
         if(!"try-error" %in% class(xi_fill)) {
@@ -326,11 +326,11 @@ estimateSTS <- function(x,
           if(!"try-error" %in% class(res_outliers)) {
             iv<-res_outliers$X
             if(ncol(iv) == 0) iv<-NULL
-          }else{
+          } else{
             iv<-NULL
             warning(paste0(namei, ": Outlier detection could not be performed due to the characteristics of the series. No outlier defined for this series."), call. = FALSE)
           }
-        }else{
+        } else{
           iv<-NULL
         }
       }
@@ -341,7 +341,7 @@ estimateSTS <- function(x,
         iv<-ts(iv, start = start(xi), frequency = freq)
       }
       regiv<-iv
-    }else if(outliers == "none"){
+    } else if(outliers == "none"){
       regiv<-NULL 
     } 
     
@@ -362,7 +362,7 @@ estimateSTS <- function(x,
         f_pval<-td_f(xi_fill)$pvalue
         if(f_pval < .05){
           regTD<-create_htdreg(xi, type = cal.effect.td)
-        }else{
+        } else{
           regTD<-NULL
         }
         ## Easter
@@ -371,10 +371,10 @@ estimateSTS <- function(x,
         if(!"try-error" %in% class(t_pval)) {
           if(t_pval < .05){
             regeaster<-easterreg
-          }else{
+          } else{
             regeaster<-NULL
           }
-        }else{
+        } else{
           regeaster<-NULL
         }
         ## All
@@ -382,22 +382,22 @@ estimateSTS <- function(x,
       } else{
         regcal<-NULL
       }
-    }else if(cal.effect == "forced"){
+    } else if(cal.effect == "forced"){
       if(!cal.effect.td == "none" & cal.effect.easter){
         regTD<-create_htdreg(xi, cal.effect.td)
         regeaster<-create_easterreg(xi)
         regcal<-cbind(regTD, regeaster)
         colnames(regcal)<-c(paste0("CAL_",colnames(regTD)), "CAL_easter")
-      }else if(!cal.effect.td == "none"){
+      } else if(!cal.effect.td == "none"){
         regcal<-regTD<-create_htdreg(xi, cal.effect.td)
         colnames(regcal)<-paste0("CAL_",colnames(regTD))
-      }else if(cal.effect.easter){
+      } else if(cal.effect.easter){
         regcal<-regeaster<-create_easterreg(xi)
         colnames(regcal)<-"CAL_easter"
-      }else{
+      } else{
         regcal<-NULL
       }
-    }else if(cal.effect == "none"){
+    } else if(cal.effect == "none"){
       regcal<-NULL
     }
 
@@ -431,16 +431,16 @@ estimateSTS <- function(x,
         if(is_nonsignificant_iv(res)){
           regall_cleaned<-clean_iv(xi_run, stsmodel_selected, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall, t_reg = res$regressors$tstat)
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
-        }else{
+        } else{
           regall_cleaned<-regall
         }
-      }else{
+      } else{
         if(is_nonsignificant_iv(res)){
           regall_cleaned<-regall
           warning(paste0(namei, ": Some specified outliers are not significant."), call. = FALSE) # just a warning if not automatic procedure
         }
       }
-    }else{
+    } else{
       regall_cleaned<-regall
     }
     
@@ -451,35 +451,35 @@ estimateSTS <- function(x,
         suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
         warning(paste0(namei, ": A BSM model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
       }
-    }else if(stsmodel_selected == "llt"){
+    } else if(stsmodel_selected == "llt"){
       if(auto_model){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         if(!include_slope){
           stsmodel_selected<-"ll"
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
+      } else{
         if(is_seasonal(xi)){
           warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(!is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if(!is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a Local level model might be more suited for this series."), call. = FALSE)
         }
       }
-    }else if(stsmodel_selected == "ll"){
+    } else if(stsmodel_selected == "ll"){
       if(auto_model){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         if(include_slope){
           stsmodel_selected<-"llt"
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
+      } else{
         if(is_seasonal(xi)){
           warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if(is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a Local Linear Trend model might be more suited for this series."), call. = FALSE)
         }
       }
-    }else if(stsmodel_selected == "noise"){
+    } else if(stsmodel_selected == "noise"){
       if(auto_model){
         include_trend<-is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         if(include_trend){
@@ -487,10 +487,10 @@ estimateSTS <- function(x,
           stsmodel_selected<-fifelse(include_slope, "llt","ll")
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
+      } else{
         if(is_seasonal(xi)){
           warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if(is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
           suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
           warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
@@ -581,7 +581,7 @@ estimateSTS_fromXLSX <- function(path.data,
   x<-as.data.frame(read_excel(path.data, sheet = "x"))
   if(is.lf){
     x.lf<-as.data.frame(read_excel(path.data, sheet = "x.lf"))
-  }else{
+  } else{
     x.lf<-NULL
   }
   stsmodel.df<-as.data.frame(read_excel(path.data, sheet = "stsmodel"))

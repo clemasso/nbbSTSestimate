@@ -38,7 +38,7 @@ summary.nbb.estimateSTS.output<- function(x, ...){
   nx<-fifelse(is.null(ncol(x$x)), 1, ncol(x$x))
   if(!is.null(x$x.lf)){
     nxl<-fifelse(is.null(ncol(x$x.lf)), 1, ncol(x$x.lf))
-  }else{
+  } else{
     nxl<-0
   }
   cat(paste0("\nNumber of series: ", nx))
@@ -73,13 +73,13 @@ plot.nbb.estimateSTS.output <- function(x, series_name = "", ...){
     if(length(names(x)[!names(x) %in% c("call", "x", "x.lf", "x.imputed")]) > 1){
       cat("The first series is plot by default. Change 'series_name' argument to plot results for another series.")
     }
-  }else if (!series_name %in% colnames(x$x)){
+  } else if (!series_name %in% colnames(x$x)){
     stop("Series name not found in the input data!")
   }
 
   if(!is.null(colnames(x$x))){
     x_init<-x$x[,series_name]
-  }else{
+  } else{
     x_init<-x$x
   }
 

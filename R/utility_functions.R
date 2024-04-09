@@ -37,7 +37,7 @@ handle_stsmodel_df <- function (x, stsmodel.df){
     stop("Since you mentionned stsmodel = 'mixed', you must provide the stsmodel of the series as a data.frame in 'stsmodel.df'.
          The stsmodel.df should contain two columns: the first one called 'series_name' and the second one called 'stsmodel'.
          The stsmodel for each series must be a valid model choosen in the list of models authorized in 'stsmodel' (including 'auto').")
-  }else{
+  } else{
     if(all(colnames(stsmodel.df) %in% c("series_name", "stsmodel"))){
       ## convert columns to character
       stsmodel.df<-data.frame(lapply(stsmodel.df, as.character), stringsAsFactors=FALSE)
@@ -78,7 +78,7 @@ handle_stsmodel_df <- function (x, stsmodel.df){
           warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE)
         }
       }
-    }else{
+    } else{
       stop("For stsmodel.df, if stsmodel='mixed', you must provide a data.frame with two columns called 'series_name' and 'stsmodel'.")
     }
   }
@@ -92,12 +92,12 @@ handle_outliers_data <- function(x, outliers.data){
     if(is.null(ncol(x))){
       n<-1
     }
-  }else{
+  } else{
     if(!is.data.frame(outliers.data)){
       stop("Since you mentionned outliers = 'userdefined', you must provide the outliers as a data.frame in 'outliers.data'.
          The outliers should contain two columns: the first one called 'series_name' and the second one called 'outliers'.
          The outliers should be mentionned in a specific format (e.g. AO_2020Q2, AO_2020M4) or they can be defined as 'auto'.")
-    }else{
+    } else{
       if(all(colnames(outliers.data) %in% c("series_name", "outliers"))){
         outliers.data<-data.frame(lapply(outliers.data, as.character), stringsAsFactors=FALSE)
         series_names<-outliers.data$series_name
@@ -116,7 +116,7 @@ handle_outliers_data <- function(x, outliers.data){
             warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE)
           }
         }
-      }else{
+      } else{
         stop("For outliers.data, if outliers='userdefined', you must provide a data.frame with two columns called 'series_name' and 'outliers'.")
       }
     }
@@ -131,7 +131,7 @@ handle_outliers_data <- function(x, outliers.data){
       series_name<-series_names[j]
       xj<-x[,series_name]
       outliers<-as.character(outliers.data[outliers.data$series_name==series_name,]$outliers)
-    }else{
+    } else{
       series_name<-fifelse(is.null(names(x)), "iv", "names(x)")
       xj<-x
       outliers<-outliers.data
@@ -140,7 +140,7 @@ handle_outliers_data <- function(x, outliers.data){
     if(any(outliers == "auto")){
       iv_list[[j]]<-"auto"
       names(iv_list)[j] <- series_name
-    }else{
+    } else{
       type<-substr(outliers,1,2)
 
       for(t in type){
@@ -167,7 +167,7 @@ handle_outliers_data <- function(x, outliers.data){
       freq_outliers<-substr(outliers,8,8)
       if(frequency(x)==4){
         if(!all(freq_outliers=="Q")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
-      }else if(frequency(x)==12){
+      } else if(frequency(x)==12){
         if(!all(freq_outliers=="M")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
       }
 
@@ -188,7 +188,7 @@ handle_outliers_data <- function(x, outliers.data){
 
         if(i==1){
           ivs<-matrix(iv,ncol=1)
-        }else{
+        } else{
           ivs<-cbind(ivs,iv)
         }
       }
@@ -208,7 +208,7 @@ handle_cal_effect_df <- function (x, cal.effect.df){
     stop("Since you mentionned cal.effect = 'mixed', you must provide the way to handle calendar effect for each series as a data.frame in 'cal.effect.df'.
          The cal.effect.df should contain four columns called 'series_name', 'cal.effect', 'cal.effect.td' and 'cal.effect.easter'.
          The three last columns must constitute valid options for each series, taken in the list of authorized options in 'cal.effect','cal.effect.td' and 'cal.effect.easter'.")
-  }else{
+  } else{
     if(all(colnames(cal.effect.df) %in% c("series_name", "cal.effect", "cal.effect.td", "cal.effect.easter"))){
       ## convert columns to character
       cal.effect.df<-data.frame(lapply(cal.effect.df, as.character), stringsAsFactors=FALSE)
@@ -238,7 +238,7 @@ handle_cal_effect_df <- function (x, cal.effect.df){
           warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE)
         }
       }
-    }else{
+    } else{
       stop("For cal.effect.df, if cal.effect='mixed', you must provide a data.frame with four columns called 'series_name', 'cal.effect', cal.effect.td' and 'cal.effect.easter'")
     }
   }
@@ -267,7 +267,7 @@ create_time_gvar <- function(x, freq){
 
   if(freq==1){
     gvar<-yr
-  }else if (freq==4){
+  } else if (freq==4){
     date_decimal<-time(x) %% 1
     q_char<-fcase(
       date_decimal<0.25,"Q1",
@@ -276,7 +276,7 @@ create_time_gvar <- function(x, freq){
       date_decimal<=1,"Q4"
     )
     gvar<-paste0(yr,q_char)
-  }else{
+  } else{
     stop("Frequency of low frequency data > 4 not yet handled. Contact developer if needed.")
   }
   return(gvar)
@@ -310,18 +310,18 @@ is_seasonal <- function(x){
     if(all(test_succeeded)){
       pvals<-c(qs_pval, f_pval, friedman_pval)
       include_seasonality<-fifelse(length(pvals[which(pvals < .05)])>=2, TRUE, FALSE)
-    }else if(any(test_succeeded)){
+    } else if(any(test_succeeded)){
       if(test_succeeded[1]){
         include_seasonality<-fifelse(qs_pval<.01,TRUE,FALSE)
-      }else if(test_succeeded[2]){
+      } else if(test_succeeded[2]){
         include_seasonality<-fifelse(f_pval<.01,TRUE,FALSE)
-      }else if(test_succeeded[3]){
+      } else if(test_succeeded[3]){
         include_seasonality<-fifelse(friedman_pval<.01,TRUE,FALSE)
       }
-    }else{
+    } else{
       include_seasonality<-FALSE
     }
-  }else{
+  } else{
     include_seasonality<-FALSE
   }
   return(include_seasonality)
@@ -332,7 +332,7 @@ create_htdreg <- function(x, type = c("Default", "WesternEU", "BE")){
 
   if(type == "Default"){
     x_calendar<-national_calendar(list())
-  }else if(type == "BE"){
+  } else if(type == "BE"){
     x_calendar<-national_calendar(list(
       special_day("NEWYEAR"),
       special_day("EASTERMONDAY"),
@@ -344,7 +344,7 @@ create_htdreg <- function(x, type = c("Default", "WesternEU", "BE")){
       special_day("ALLSAINTSDAY"),
       special_day("ARMISTICE"),
       special_day("CHRISTMAS")))
-  }else if(type == "WesternEU"){
+  } else if(type == "WesternEU"){
     x_calendar<-national_calendar(list(
       special_day("NEWYEAR"),
       special_day("EASTERMONDAY"),
@@ -389,7 +389,7 @@ easter_f<-function(x, easter.reg, regressors){
 
   if(frequency(x) == 4){
     pos_easter<-7
-  }else if(frequency(x) == 12){
+  } else if(frequency(x) == 12){
     pos_easter<-15
   }
 
@@ -417,9 +417,9 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
   if(stsmodel == 'bsm'){
     trend<-locallineartrend("trend")
     seas<-seasonal("seas", frequency(x))
-  }else if(stsmodel == 'llt'){
+  } else if(stsmodel == 'llt'){
     trend<-locallineartrend("trend")
-  }else if(stsmodel == 'll'){
+  } else if(stsmodel == 'll'){
     trend<-locallevel("ll")
   }
   if(!is.null(regressors)){
@@ -431,25 +431,25 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
     if(stsmodel == 'bsm'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, seas, noise, reg))
-      }else{
+      } else{
         all<-aggregation("m", list(trend, seas, noise))
       }
-    }else if(stsmodel == 'llt'){
+    } else if(stsmodel == 'llt'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, noise, reg))
-      }else{
+      } else{
         all<-aggregation("m", list(trend, noise))
       }
-    }else if(stsmodel == 'll'){
+    } else if(stsmodel == 'll'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(trend, noise, reg))
-      }else{
+      } else{
         all<-aggregation("m", list(trend, noise))
       }
-    }else if(stsmodel == 'noise'){
+    } else if(stsmodel == 'noise'){
       if(!is.null(regressors)){
         all<-aggregation("m", list(noise, reg))
-      }else{
+      } else{
         all<-noise
       }
     }
@@ -457,7 +457,7 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
     add(model, c)
     add_equation(eq, "c")
 
-  }else{
+  } else{
     if(stsmodel == 'bsm'){
       add(model, trend)
       add(model, seas)
@@ -469,7 +469,7 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
         add(model, reg)
         add_equation(eq, "iv")
       }
-    }else if(stsmodel == 'llt'){
+    } else if(stsmodel == 'llt'){
       add(model, trend)
       add(model, noise)
       add_equation(eq, "trend")
@@ -478,7 +478,7 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
         add(model, reg)
         add_equation(eq, "iv")
       }
-    }else if(stsmodel == 'll'){
+    } else if(stsmodel == 'll'){
       add(model, trend)
       add(model, noise)
       add_equation(eq, "ll")
@@ -487,7 +487,7 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
         add(model, reg)
         add_equation(eq, "iv")
       }
-    }else if(stsmodel == 'noise'){
+    } else if(stsmodel == 'noise'){
       add(model, noise)
       add_equation(eq, "noise")
       if(!is.null(regressors)){
@@ -561,11 +561,11 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
 
     if(frequency(x) == 4){
       pos_irregular<-pos_trend+5
-    }else if(frequency(x) == 12){
+    } else if(frequency(x) == 12){
       pos_irregular<-pos_trend+13
     }
     irregular<-smoothed_states[,pos_irregular]
-  }else if(stsmodel == "llt"){
+  } else if(stsmodel == "llt"){
     pos_trend<-fifelse(cumulator,2,1)
     pos_slope<-pos_trend+1
 
@@ -575,7 +575,7 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
 
     pos_irregular<-pos_trend+2
     irregular<-smoothed_states[,pos_irregular]
-  }else if(stsmodel == "ll"){
+  } else if(stsmodel == "ll"){
     pos_trend<-fifelse(cumulator,2,1)
 
     trend<-smoothed_states[,pos_trend]
@@ -584,7 +584,7 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
 
     pos_irregular<-pos_trend+1
     irregular<-smoothed_states[,pos_irregular]
-  }else if(stsmodel == "noise"){
+  } else if(stsmodel == "noise"){
     trend<-numeric(nrow(smoothed_states))
     slope<-numeric(nrow(smoothed_states))
     seasonal<-numeric(nrow(smoothed_states))
@@ -601,9 +601,9 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
       ### regression type
       if(toupper(substr(reg_names[i],1,2)) %in% c("AO","LS","TC","SO")){
         reg_type<-toupper(substr(reg_names[i],1,2))
-      }else if(substr(reg_names[i],1,3) == "CAL"){
+      } else if(substr(reg_names[i],1,3) == "CAL"){
         reg_type<-"CAL"
-      }else{
+      } else{
         reg_type<-"undefined"
       }
 
@@ -613,9 +613,9 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
       # add regression effect to the right component
       if (reg_type %in% c("LS","TC")){
         trend <- trend + regi
-      }else if (reg_type %in% c("CAL","SO")){
+      } else if (reg_type %in% c("CAL","SO")){
         seasonal <- seasonal + regi
-      }else if (reg_type %in% c("AO","undefined")){
+      } else if (reg_type %in% c("AO","undefined")){
         irregular <- irregular + regi
       }
     }
@@ -642,7 +642,7 @@ get_regressors_est <- function(results, stsmodel, cumulator, regressors){
     if(stsmodel == "bsm"){
       if(frequency(regressors) == 4){
         fc_cumulator<- 8
-      }else if(frequency(regressors) == 12){
+      } else if(frequency(regressors) == 12){
         fc_cumulator<- 16
       }
     }
@@ -662,7 +662,7 @@ get_regressors_est <- function(results, stsmodel, cumulator, regressors){
     names(b_reg)<-names(b_vreg)<-names(t)<-colnames(regressors)
 
     regressors_est <- list(regressors = regressors, param = b_reg, vparam = b_vreg, tstat = t)
-  }else{
+  } else{
     regressors_est <- NULL
   }
 
@@ -709,7 +709,7 @@ getvslope <- function(results, stsmodel){
     smoothing_vstates_est<-result(results,"ssf.smoothing.vstates")
     lr<-nrow(smoothing_vstates_est)
     vslope<-as.numeric(smoothing_vstates_est[lr,3])
-  }else{
+  } else{
     vslope<-NULL
   }
   return(vslope)
@@ -734,17 +734,17 @@ clean_iv <- function(x, stsmodel, cumulator, cumulator.ratio, regressors, t_reg)
     if(length(t_iv_ns) == 0){
       regressors_cleaned<-regressors
       break
-    }else{
+    } else{
       regressors_cleaned<-regressors[,!colnames(regressors) %in% names(t_iv_ns), drop = FALSE]
       if(length(regressors_cleaned) == 0){
         regressors_cleaned<-NULL
         break
-      }else{
+      } else{
         res<-try(sts.run(x, stsmodel, cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors_cleaned), silent=TRUE)
         if(!"try-error" %in% class(res)) {
           regressors<-res$regressors$regressors
           t_reg<-res$regressors$tstat
-        }else{
+        } else{
           regressors_cleaned<-regressors
           break
         }
@@ -765,17 +765,17 @@ is_slope <- function(x, cumulator, cumulator.ratio, regressors){
       slope_est<-as.numeric(res_llt$table[1,"Slope"])
       t<-slope_est/sqrt(res_llt$vslope)
       include_slope<-fifelse(abs(t)>1.96,TRUE,FALSE)
-    }else{
+    } else{
       res_ll<-try(sts.run(x, stsmodel = "ll", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
       if(!"try-error" %in% class(res_ll)) {
         ser_llt<-res_llt$likelihood$ser
         ser_ll<-res_ll$likelihood$ser
         include_slope<-fifelse(ser_llt<ser_ll,TRUE,FALSE)
-      }else{
+      } else{
         include_slope<-TRUE
       }
     }
-  }else{
+  } else{
     include_slope<-FALSE
   }
 
@@ -795,21 +795,21 @@ is_trend <- function(x, cumulator, cumulator.ratio, regressors){
     ser_ll<-res_ll$likelihood$ser
     ser_noise<-res_noise$likelihood$ser
     include_trend<-fifelse(ser_noise > ser_llt | ser_noise > ser_ll, TRUE, FALSE)
-  }else if(any(test_succeeded)){
+  } else if(any(test_succeeded)){
     if(test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
       ser_llt<-res_llt$likelihood$ser
       ser_noise<-res_noise$likelihood$ser
       include_trend<-fifelse(ser_noise > ser_llt, TRUE, FALSE)
-    }else if(test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
+    } else if(test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
       ser_ll<-res_ll$likelihood$ser
       ser_noise<-res_noise$likelihood$ser
       include_trend<-fifelse(ser_noise > ser_ll, TRUE, FALSE)
-    }else if(!test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
+    } else if(!test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
       include_trend<-FALSE
-    }else{
+    } else{
       include_trend<-TRUE
     }
-  }else{
+  } else{
     include_trend<-TRUE
   }
   return(include_trend)
