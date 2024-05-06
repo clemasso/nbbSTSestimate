@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   fig.dim = c(7,4) * 1.4
 )
+options(warn = 1L)
 ```
 
 # nbbSTSestimate
@@ -28,6 +29,8 @@ Performs in-sample imputation of missing values, as well as for-now- and back-ca
 
 
 ## Installation
+
+Running rjd3 packages requires Java 17 or higher. How to set up such a configuration in R is explained [here](https://jdemetra-new-documentation.netlify.app/#installing-the-software).
 
 ```{r, echo = TRUE, eval = FALSE}
 remotes::install_github("clemasso/nbbSTSestimate")
@@ -51,7 +54,7 @@ retail_extract <- cbind(
 x <- window(retail_extract, c(1990, 1), c(2012, 6), extend = TRUE)
 x.lf <- ts(rbind(
     matrix(c(325000, 330000, 7800, 8000, 17500, 18000), nrow = 2, byrow = FALSE),
-    aggregate.ts(retail_extract, nfreq = 1),
+    aggregate.ts(retail_extract, nfrequency = 1),
     matrix(c(525000, 15000, 27000), nrow = 1)
 ), start = c(1990, 1), frequency = 1)
 ## Estimate
@@ -102,4 +105,4 @@ pull requests should include **updated tests** and **updated documentation**. If
 
 ## Licensing
 
-The code of this project is licensed under the [European Union Public Licence (EUPL)](https://joinup.ec.europa.eu/page/eupl-text-11-12).
+The code of this project is licensed under the [European Union Public Licence (EUPL)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12).
