@@ -11,7 +11,7 @@ print.nbb.estimateSTS.output <- function(x, ...){
 
   series_attr<-names(x)[!names(x) %in% c("call", "x", "x.lf", "x.imputed")]
 
-  if(length(series_attr) == 1){
+  if (length(series_attr) == 1){
     print.default(x[[1]][[3]], ...)
   }
 
@@ -36,9 +36,9 @@ summary.nbb.estimateSTS.output<- function(x, ...){
   print.default(x$call, ...)
 
   nx<-fifelse(is.null(ncol(x$x)), 1, ncol(x$x))
-  if(!is.null(x$x.lf)){
+  if (!is.null(x$x.lf)){
     nxl<-fifelse(is.null(ncol(x$x.lf)), 1, ncol(x$x.lf))
-  }else{
+  } else{
     nxl<-0
   }
   cat(paste0("\nNumber of series: ", nx))
@@ -47,7 +47,7 @@ summary.nbb.estimateSTS.output<- function(x, ...){
 
   # models
   cat("\nModel:\n")
-  if(nxl > 0){
+  if (nxl > 0){
     cat("Imputation using State Space models with cumulator (when low frequency data were submitted) \n")
   } else{
     cat("Imputation using State Space models \n")
@@ -67,19 +67,19 @@ summary.nbb.estimateSTS.output<- function(x, ...){
 #'
 plot.nbb.estimateSTS.output <- function(x, series_name = "", ...){
 
-  if(series_name == ""){
+  if (series_name == ""){
     series_name <- names(x)[1]
 
-    if(length(names(x)[!names(x) %in% c("call", "x", "x.lf", "x.imputed")]) > 1){
+    if (length(names(x)[!names(x) %in% c("call", "x", "x.lf", "x.imputed")]) > 1){
       cat("The first series is plot by default. Change 'series_name' argument to plot results for another series.")
     }
-  }else if (!series_name %in% colnames(x$x)){
+  } else if (!series_name %in% colnames(x$x)){
     stop("Series name not found in the input data!")
   }
 
-  if(!is.null(colnames(x$x))){
+  if (!is.null(colnames(x$x))){
     x_init<-x$x[,series_name]
-  }else{
+  } else{
     x_init<-x$x
   }
 

@@ -1,35 +1,47 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%", 
+  fig.align = "center",
+  fig.dim = c(7,4) * 1.4
+)
+options(warn = 1L)
+```
 
 # nbbSTSestimate
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-Multiprocessing time series imputation by State Space models (incl. low
-frequency input)
+Multiprocessing time series imputation by State Space models (incl. low frequency input)
+
 
 ## Description
+Performs in-sample imputation of missing values, as well as for-now- and back-casting of univariate time series by integrating  (or not) low-frequency input.
 
-Performs in-sample imputation of missing values, as well as for-now- and
-back-casting of univariate time series by integrating (or not)
-low-frequency input.
 
 ## Installation
 
-Running rjd3 packages requires Java 17 or higher. How to set up such a
-configuration in R is explained
-[here](https://jdemetra-new-documentation.netlify.app/#installing-the-software).
+Running rjd3 packages requires Java 17 or higher. How to set up such a configuration in R is explained [here](https://jdemetra-new-documentation.netlify.app/#installing-the-software).
 
-``` r
+```{r, echo = TRUE, eval = FALSE}
 remotes::install_github("clemasso/nbbSTSestimate")
 ```
+
 
 ## Usage (2 possibilites)
 
 ### 1) Input in R
 
-``` r
+```{r, echo = TRUE, eval = TRUE}
 library("nbbSTSestimate")
 
 # Examples
@@ -47,15 +59,10 @@ x.lf <- ts(rbind(
 ), start = c(1990, 1), frequency = 1)
 ## Estimate
 rslt1 <- estimateSTS(x, x.lf) # auto procedures for model selection, outlier detection and calendar effect by default
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
 plot(rslt1,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" />
-
-``` r
+```{r, echo = TRUE, eval = TRUE}
 library("nbbSTSestimate")
 
 ## Adding specific input
@@ -73,18 +80,12 @@ rslt2 <- estimateSTS(
     cal.effect.td = "BE",
     cal.effect.easter = TRUE
 )
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning: GroceryStores: Some specified outliers are not significant.
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
 plot(rslt2,"BookStores")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" />
-
 ### 2) Input in Excel
 
-``` r
+```{r, echo = TRUE, eval = FALSE}
 # Examples
 ## Fill structured .xlsx file with your input. See template or vignette for the structure of the Excel file
 res <- estimateSTS_fromXLSX(
@@ -95,15 +96,13 @@ res <- estimateSTS_fromXLSX(
 )
 ```
 
+
 ## Package Maintenance and contributing
 
-Any contribution is welcome and should be done through pull requests
-and/or issues. pull requests should include **updated tests** and
-**updated documentation**. If functionality is changed, docstrings
-should be added or updated.
+Any contribution is welcome and should be done through pull requests and/or issues.
+pull requests should include **updated tests** and **updated documentation**. If functionality is changed, docstrings should be added or updated.
+
 
 ## Licensing
 
-The code of this project is licensed under the [European Union Public
-Licence
-(EUPL)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12).
+The code of this project is licensed under the [European Union Public Licence (EUPL)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12).

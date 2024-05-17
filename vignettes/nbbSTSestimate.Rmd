@@ -43,7 +43,7 @@ retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores,
 
 x<-window(retail_extract, c(1990,1), c(2012,6), extend = TRUE)
 x.lf<-ts(rbind(matrix(c(325000,330000,7800,8000,17500,18000), nrow = 2, byrow = FALSE),
-         aggregate.ts(retail_extract, nfreq = 1),
+         aggregate.ts(retail_extract, nfrequency = 1),
          matrix(c(525000,15000,27000), nrow = 1)), start = c(1990,1), frequency = 1)
 outliers_input<-data.frame(series_name=c("GroceryStores", "GroceryStores", "BookStores", "ShoeStores"),
                            outliers=c("LS_2008M12", "AO_2002M04", "auto", "auto"))
