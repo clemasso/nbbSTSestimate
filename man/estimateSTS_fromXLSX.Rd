@@ -15,10 +15,10 @@ estimateSTS_fromXLSX(
 \arguments{
 \item{path.data}{a string containing the path of the input XLSX file.}
 
-\item{is.lf}{a boolean parameter whether low frequency series should be 
+\item{is.lf}{a boolean parameter whether low frequency series should be
 considered.}
 
-\item{conversion}{type of consistency between the high frequency series and 
+\item{conversion}{type of consistency between the high frequency series and
 the low frequency series (if any)}
 
 \item{path.output}{a string containing the path of the output (which is also

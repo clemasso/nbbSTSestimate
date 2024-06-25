@@ -60,23 +60,26 @@ handle_stsmodel_df <- function (x, stsmodel.df){
       ## check duplicates in series name
       series_names<-stsmodel.df$series_name
       if (length(series_names) != length(unique(series_names))){
-        warning("The stsmodel.df contains duplicates. Only the first occurence will be considered.", call. = FALSE)
-        stsmodel.df<-stsmodel.df[!duplicated(stsmodel.df$series_name),]
-        series_names<-stsmodel.df$series_name
+          warning("The stsmodel.df contains duplicates. Only the first occurence will be considered.", call. = FALSE)
+          stsmodel.df<-stsmodel.df[!duplicated(stsmodel.df$series_name),]
+          series_names<-stsmodel.df$series_name
       }
-      ## series name in stsmodel.df but not in the data
-      for(s in series_names){
-        if (!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input."))
-        }
-      }
-      ## series name in the data but not in stsmodel.df
-      x_series_names<-colnames(x)[-1]
-      for(s in x_series_names){
-        if (!s %in% series_names){
-          stsmodel.df<-rbind(stsmodel.df, c(s, "auto"))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE)
-        }
+
+      if(is.mts(x)){
+          ## series name in stsmodel.df but not in the data
+          for(s in series_names){
+              if (!s %in% colnames(x)){
+                  stop(paste0("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input."))
+              }
+          }
+          ## series name in the data but not in stsmodel.df
+          x_series_names<-colnames(x)[-1]
+          for(s in x_series_names){
+              if (!s %in% series_names){
+                  stsmodel.df<-rbind(stsmodel.df, c(s, "auto"))
+                  warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE)
+              }
+          }
       }
     } else{
       stop("For stsmodel.df, if stsmodel='mixed', you must provide a data.frame with two columns called 'series_name' and 'stsmodel'.")
@@ -102,19 +105,21 @@ handle_outliers_data <- function(x, outliers.data){
         outliers.data<-data.frame(lapply(outliers.data, as.character), stringsAsFactors=FALSE)
         series_names<-outliers.data$series_name
 
-        ## series name in outliers.data but not in the data
-        for(s in series_names){
-          if (!s %in% colnames(x)){
-            stop(paste0("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input."))
-          }
-        }
-        ## series name in the data but not in outliers.data
-        x_series_names<-colnames(x)[-1]
-        for(s in x_series_names){
-          if (!s %in% series_names){
-            outliers.data<-rbind(outliers.data, c(s, "auto"))
-            warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE)
-          }
+        if(is.mts(x)){
+            ## series name in outliers.data but not in the data
+            for(s in series_names){
+                if (!s %in% colnames(x)){
+                    stop(paste0("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input."))
+                }
+            }
+            ## series name in the data but not in outliers.data
+            x_series_names<-colnames(x)[-1]
+            for(s in x_series_names){
+                if (!s %in% series_names){
+                    outliers.data<-rbind(outliers.data, c(s, "auto"))
+                    warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE)
+                }
+            }
         }
       } else{
         stop("For outliers.data, if outliers='userdefined', you must provide a data.frame with two columns called 'series_name' and 'outliers'.")
@@ -129,7 +134,8 @@ handle_outliers_data <- function(x, outliers.data){
 
     if (is.data.frame(outliers.data)){
       series_name<-series_names[j]
-      xj<-x[,series_name]
+      if(is.mts(x)) xj<-x[,series_name]
+      else xj <- x
       outliers<-as.character(outliers.data[outliers.data$series_name==series_name,]$outliers)
     } else{
       series_name<-fifelse(is.null(names(x)), "iv", "names(x)")
@@ -224,19 +230,22 @@ handle_cal_effect_df <- function (x, cal.effect.df){
         cal.effect.df<-cal.effect.df[!duplicated(cal.effect.df$series_name),]
         series_names<-cal.effect.df$series_name
       }
-      ## series name in cal.effect.df but not in the data
-      for(s in series_names){
-        if (!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input."))
-        }
-      }
-      ## series name in the data but not in cal.effect.df
-      x_series_names<-colnames(x)[-1]
-      for(s in x_series_names){
-        if (!s %in% series_names){
-          cal.effect.df<-rbind(cal.effect.df, c(s, "auto", "Default", TRUE))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE)
-        }
+
+      if(is.mts(x)){
+          ## series name in cal.effect.df but not in the data
+          for(s in series_names){
+              if (!s %in% colnames(x)){
+                  stop(paste0("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input."))
+              }
+          }
+          ## series name in the data but not in cal.effect.df
+          x_series_names<-colnames(x)[-1]
+          for(s in x_series_names){
+              if (!s %in% series_names){
+                  cal.effect.df<-rbind(cal.effect.df, c(s, "auto", "Default", TRUE))
+                  warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE)
+              }
+          }
       }
     } else{
       stop("For cal.effect.df, if cal.effect='mixed', you must provide a data.frame with four columns called 'series_name', 'cal.effect', cal.effect.td' and 'cal.effect.easter'")

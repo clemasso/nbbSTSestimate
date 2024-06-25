@@ -124,7 +124,6 @@ estimateSTS <- function(x,
   # I. Pre-processing
 
   # I.a. Input validation
-
   x<-convert_to_ts(x)
   if (!is.null(x.lf)){
     x.lf<-convert_to_ts(x.lf)
