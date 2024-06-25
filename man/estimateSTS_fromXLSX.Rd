@@ -34,7 +34,6 @@ required structure of the XLSX file.
 }
 \examples{
 \dontrun{
-file.name<-"myinput.xlsx"
 res<-estimateSTS_fromXLSX(path.data = "input_to_R.xlsx",
                           is.lf = TRUE,
                           conversion = "Sum",

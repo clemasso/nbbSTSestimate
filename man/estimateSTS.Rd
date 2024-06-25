@@ -20,87 +20,76 @@ estimateSTS(
 )
 }
 \arguments{
-\item{x}{(Set of) high frequency series to impute.
-Should be either a (m)ts object or a data frame. In the second case,
-the first column should be in a format that can be translated into
-a Date object.}
+\item{x}{(Set of) high frequency series to impute. Should be either a (m)ts
+object or a data frame. In the second case, the first column should be in a
+format that can be translated into a Date object.}
 
-\item{x.lf}{(Set of) low frequency series.
-Should be either a (m)ts object or a data frame. In the second
-case, the first column should be in a format that can be
-translated into a Date object. It can also be defined as NULL
-(default value) when no low frequency series is available.
-As for x, it can also include missing values}
+\item{x.lf}{(Set of) low frequency series. Should be either a (m)ts object or
+a data frame. In the second case, the first column should be in a format
+that can be translated into a Date object. It can also be defined as NULL
+(default value) when no low frequency series is available. As for x, it can
+also include missing values}
 
 \item{stsmodel}{Structural model to consider for the high frequency series.
-When 'auto' is selected (default value), an automatic
-selection of model is performed. When 'mixed' is selected,
-it allows the user to attribute a different model for each
-series individually via the parameter 'stsmodel.df'}
+When 'auto' is selected (default value), an automatic selection of model is
+performed. When 'mixed' is selected, it allows the user to attribute a
+different model for each series individually via the parameter
+'stsmodel.df'}
 
-\item{stsmodel.df}{Only used when stsmodel = 'mixed'. Ignored otherwise.
-When relevant, it should consist of a data.frame
-containing two columns: the first one called 'series_name'
-and the second one called 'stsmodel'. The stsmodel for
-each series must be a valid model choosen in the list of
+\item{stsmodel.df}{Only used when stsmodel = 'mixed'. Ignored otherwise. When
+relevant, it should consist of a data.frame containing two columns: the
+first one called 'series_name' and the second one called 'stsmodel'. The
+stsmodel for each series must be a valid model choosen in the list of
 models authorized in 'stsmodel' (including 'auto').}
 
 \item{outliers}{Treatment of outliers. When outliers = 'auto', an automatic
-outlier detection is performed for each series. When
-outliers = 'none', no outlier is considered. Please use this
-option with care as structural models, like any linear model,
-are sensitive to undetected outliers which could result to
-poor imputation. Finally, outliers = 'userdefined' allows
-you to define the outliers type and period manually or use
-a different treatment for each series via the parameter
-'outliers.df'.}
+outlier detection is performed for each series. When outliers = 'none', no
+outlier is considered. Please use this option with care as structural
+models, like any linear model, are sensitive to undetected outliers which
+could result to poor imputation. Finally, outliers = 'userdefined' allows
+you to define the outliers type and period manually or use a different
+treatment for each series via the parameter 'outliers.df'.}
 
-\item{outliers.df}{Only used when outliers = 'userdefined'. Ignored otherwise.
-When relevant, it should consist of a data.frame
-containing two columns: the first one called 'series_name'
-and the second one called 'outliers'. The outliers
-specified for each series should mentionned the type of
-outlier and the period in the following format
-'LS_2023Q1'for quarterly series of 'AO_2023M01' for
-monthly series. To  define several outliers for a series,
-just write the outliers one below each other while
-repeating the series name each time in the first column.
-It is also possible to use the options 'auto' and 'none'
-for a series as in 'outliers'.}
+\item{outliers.df}{Only used when outliers = 'userdefined'. Ignored
+otherwise. When relevant, it should consist of a data.frame containing two
+columns: the first one called 'series_name' and the second one called
+'outliers'. The outliers specified for each series should mentionned the
+type of outlier and the period in the following format 'LS_2023Q1'for
+quarterly series of 'AO_2023M01' for monthly series. To  define several
+outliers for a series, just write the outliers one below each other while
+repeating the series name each time in the first column. It is also
+possible to use the options 'auto' and 'none' for a series as in
+'outliers'.}
 
-\item{cal.effect}{Treatment of calendar effects. When cal.effect = 'auto',
-an automatic detection of calendar effects is performed
-for each series. It can also be ignored or forced. When
-calendar effects are considered, the specifications defined
-in 'cal.effect.td' and 'cal.effect.easter' are used.
-Finally, when 'mixed' is selected, it allows the user to
-use different specifications for each series via the
-parameter 'cal.effect.df'. Note that calendar effects are
-mostly important for monthly series. In quarterly series,
-they are roughly detectable and therefore less relevant.}
+\item{cal.effect}{Treatment of calendar effects. When cal.effect = 'auto', an
+automatic detection of calendar effects is performed for each series. It
+can also be ignored or forced. When calendar effects are considered, the
+specifications defined in 'cal.effect.td' and 'cal.effect.easter' are used.
+Finally, when 'mixed' is selected, it allows the user to use different
+specifications for each series via the parameter 'cal.effect.df'. Note that
+calendar effects are mostly important for monthly series. In quarterly
+series, they are roughly detectable and therefore less relevant.}
 
 \item{cal.effect.td}{Calendar to consider for trading days. The 'Default'
-only consider the number of Monday, Tuesday, ..., Sunday
-at each period. 'WesternEU' and 'BE' also add national
-holidays (see vignette for more details) and consider
-them as Sundays.}
+only consider the number of Monday, Tuesday, ..., Sunday at each period.
+'WesternEU' and 'BE' also add national holidays (see vignette for more
+details) and consider them as Sundays.}
 
-\item{cal.effect.easter}{A boolean parameter whether Easter holiday should
-or not be considered amongst the calendar effects.}
+\item{cal.effect.easter}{A boolean parameter whether Easter holiday should or
+not be considered amongst the calendar effects.}
 
 \item{cal.effect.df}{Only used when cal.effect = 'mixed'. Ignored otherwise.
-When relevant, it should consist of a data.frame
-containing four columns called 'series_name',
-'cal.effect', 'cal.effect.td' and 'cal.effect.easter'.
-The option selected for each of the three last variables
-should  be a valid option in the list of options
-authorized in the corresponding parameter.}
+When relevant, it should consist of a data.frame containing four columns
+called 'series_name', 'cal.effect', 'cal.effect.td' and
+'cal.effect.easter'. The option selected for each of the three last
+variables should  be a valid option in the list of options authorized in
+the corresponding parameter.}
 
 \item{conversion}{type of consistency between the high frequency series and
 the low frequency series (if any)}
 
-\item{path.xlsx}{a string containing the path of the XLSX file to copy
-the imputed series. If the path is NULL, no file is created.}
+\item{path.xlsx}{a string containing the path of the XLSX file to copy the
+imputed series. If the path is NULL, no file is created.}
 }
 \value{
 an object of class "nbb.estimateSTS.output"
@@ -122,7 +111,7 @@ retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores,
 
 x<-window(retail_extract, c(1990,1), c(2012,6), extend = TRUE)
 x.lf<-ts(rbind(matrix(c(325000,330000,7800,8000,17500,18000), nrow = 2, byrow = FALSE),
-         aggregate.ts(retail_extract, nfrequency = 1),
+         aggregate.ts(retail_extract, nfreq = 1),
          matrix(c(525000,15000,27000), nrow = 1)), start = c(1990,1), frequency = 1)
 res1 <- estimateSTS(x, x.lf) # auto procedures for model selection, outlier detection and calendar effect by default
 #plot(res1,"BookStores")
