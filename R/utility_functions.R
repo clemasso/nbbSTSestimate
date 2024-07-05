@@ -519,7 +519,7 @@ sts.run <- function(x, stsmodel = c("bsm", "llt", "ll", "noise"), cumulator = FA
   residuals_out<-list(residuals = vtilt, statistics = vtilt_statistics)
 
   ## 5.4. Likelihood
-  likelihood=list(ll=result(res, "likelihood.ll"), ser=result(res,"likelihood.ser"))
+  likelihood<-list(ll=result(res, "likelihood.ll"), ser=result(res,"likelihood.ser"))
 
   ## 5.5. Variance of the slope component (used for test of specification)
   vslope<-getvslope(res, stsmodel)
