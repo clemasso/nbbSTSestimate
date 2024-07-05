@@ -1,7 +1,7 @@
 Package: nbbSTSestimate
 Type: Package
 Title: Multi-processing time series estimation by State Space models (incl. low frequency input)
-Version: 1.0.1
+Version: 1.0.3
 Authors@R: 
     person(given = "Corentin",
            family = "Lemasson",
@@ -27,7 +27,7 @@ License: EUPL
 Encoding: UTF-8
 Collate: 'main_functions.R' 'utility_functions.R' 'output.R'
 NeedsCompilation: no
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown

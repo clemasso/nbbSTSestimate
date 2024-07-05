@@ -22,7 +22,7 @@ configuration in R is explained
 [here](https://jdemetra-new-documentation.netlify.app/#installing-the-software).
 
 ``` r
-remotes::install_github("clemasso/nbbSTSestimate")
+remotes::install_github("clemasso/nbbSTSestimate", build_vignette = TRUE)
 ```
 
 ## Usage (2 possibilites)
