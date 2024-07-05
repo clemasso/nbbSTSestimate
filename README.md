@@ -47,9 +47,6 @@ x.lf <- ts(rbind(
 ), start = c(1990, 1), frequency = 1)
 ## Estimate
 rslt1 <- estimateSTS(x, x.lf) # auto procedures for model selection, outlier detection and calendar effect by default
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
 plot(rslt1,"BookStores")
 ```
 
@@ -73,10 +70,10 @@ rslt2 <- estimateSTS(
     cal.effect.td = "BE",
     cal.effect.easter = TRUE
 )
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
 #> Warning: GroceryStores: Some specified outliers are not significant.
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
-#> Warning in xi_lf_dt$x: correspondance partielle de 'x' en 'xi_lf'
+```
+
+``` r
 plot(rslt2,"BookStores")
 ```
 
