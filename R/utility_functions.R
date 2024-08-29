@@ -32,7 +32,7 @@ check_stsmodel <- function(x, stsmodel){
 }
 
 # Check that 'stsmodel.df' is filled in properly when stsmodel = "mixed"
-handle_stsmodel_df <- function (x, stsmodel.df){
+handle_stsmodel_df <- function(x, stsmodel.df){
   if (!is.data.frame(stsmodel.df)){
     stop("Since you mentionned stsmodel = 'mixed', you must provide the stsmodel of the series as a data.frame in 'stsmodel.df'.
          The stsmodel.df should contain two columns: the first one called 'series_name' and the second one called 'stsmodel'.
@@ -161,7 +161,7 @@ handle_outliers_data <- function(x, outliers.data){
         if (is.na(yri)){stop(paste0(yri, " is not a proper year in outliers definition."))}
         if (is.na(peri)){stop(paste0(peri, " is not a proper quarter or month in outliers definition."))}
 
-        if (yri<start(x)[1] | yri>end(x)[1] | (yri==start(x)[1] & peri<start(x)[2]) | (yri==end(x)[1] & peri>end(x)[2])) {
+        if (yri<start(x)[1] || yri>end(x)[1] || (yri==start(x)[1] && peri<start(x)[2]) || (yri==end(x)[1] && peri>end(x)[2])) {
           stop(paste0("The outlier ", outliers[i], " is outside the range of the series."))
         }
       }
@@ -204,7 +204,7 @@ handle_outliers_data <- function(x, outliers.data){
 }
 
 # Check that 'cal.effect.df' is filled in properly when cal.effect = "mixed"
-handle_cal_effect_df <- function (x, cal.effect.df){
+handle_cal_effect_df <- function(x, cal.effect.df){
   if (!is.data.frame(cal.effect.df)){
     stop("Since you mentionned cal.effect = 'mixed', you must provide the way to handle calendar effect for each series as a data.frame in 'cal.effect.df'.
          The cal.effect.df should contain four columns called 'series_name', 'cal.effect', 'cal.effect.td' and 'cal.effect.easter'.
@@ -284,7 +284,7 @@ create_time_gvar <- function(x, freq){
 }
 
 # Moving average of time series (source: package forecast)
-ma <- function (x, order, centre = TRUE){
+ma <- function(x, order, centre = TRUE){
   if (abs(order - round(order)) > 1e-08) {
     stop("order must be an integer")
   }
@@ -797,15 +797,15 @@ is_trend <- function(x, cumulator, cumulator.ratio, regressors){
         ser_noise<-res_noise$likelihood$ser
         include_trend<-fifelse(ser_noise > ser_llt | ser_noise > ser_ll, TRUE, FALSE)
     } else if (any(test_succeeded)){
-        if (test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
+        if (test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             ser_llt<-res_llt$likelihood$ser
             ser_noise<-res_noise$likelihood$ser
             include_trend<-fifelse(ser_noise > ser_llt, TRUE, FALSE)
-        } else if (test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
+        } else if (test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             ser_ll<-res_ll$likelihood$ser
             ser_noise<-res_noise$likelihood$ser
             include_trend<-fifelse(ser_noise > ser_ll, TRUE, FALSE)
-        } else if (!test_succeeded[1] & !test_succeeded[2] & test_succeeded[3]){
+        } else if (!test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             include_trend<-FALSE
         } else {
             include_trend<-TRUE

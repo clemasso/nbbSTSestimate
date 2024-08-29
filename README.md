@@ -22,7 +22,7 @@ configuration in R is explained
 [here](https://jdemetra-new-documentation.netlify.app/#installing-the-software).
 
 ``` r
-remotes::install_github("clemasso/nbbSTSestimate", build_vignette = TRUE)
+remotes::install_github("clemasso/nbbSTSestimate")
 ```
 
 ## Usage (2 possibilites)
@@ -71,9 +71,6 @@ rslt2 <- estimateSTS(
     cal.effect.easter = TRUE
 )
 #> Warning: GroceryStores: Some specified outliers are not significant.
-```
-
-``` r
 plot(rslt2,"BookStores")
 ```
 

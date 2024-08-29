@@ -400,7 +400,7 @@ estimateSTS <- function(x,
         regcal<-NULL
       }
     } else if (cal.effect == "forced"){
-      if (!cal.effect.td == "none" & cal.effect.easter){
+      if (!cal.effect.td == "none" && cal.effect.easter){
         regTD<-create_htdreg(xi, cal.effect.td)
         regeaster<-create_easterreg(xi)
         regcal<-cbind(regTD, regeaster)
@@ -463,7 +463,7 @@ estimateSTS <- function(x,
 
     ## On model
     if (stsmodel_selected == "bsm"){
-      if (!auto_model & !is_seasonal(xi)){
+      if (!auto_model && !is_seasonal(xi)){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
         warning(paste0(namei, ": A BSM model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
