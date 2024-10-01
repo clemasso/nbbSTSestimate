@@ -59,7 +59,7 @@ handle_stsmodel_df <- function(x, stsmodel.df){
 
       ## check duplicates in series name
       series_names<-stsmodel.df$series_name
-      if (length(series_names) != length(unique(series_names))){
+      if (anyDuplicated(series_names) == 0L){
         warning("The stsmodel.df contains duplicates. Only the first occurence will be considered.", call. = FALSE)
         stsmodel.df<-stsmodel.df[!duplicated(stsmodel.df$series_name),]
         series_names<-stsmodel.df$series_name
@@ -220,7 +220,7 @@ handle_cal_effect_df <- function(x, cal.effect.df){
 
       ## check duplicates in series name
       series_names<-cal.effect.df$series_name
-      if (length(series_names) != length(unique(series_names))){
+      if (anyDuplicated(series_names) == 0L) {
         warning("The cal.effect.df contains duplicates. Only the first occurence will be considered.", call. = FALSE)
         cal.effect.df<-cal.effect.df[!duplicated(cal.effect.df$series_name),]
         series_names<-cal.effect.df$series_name
