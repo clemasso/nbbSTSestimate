@@ -299,7 +299,7 @@ estimateSTS <- function(x,
         stsmodel_selected<-"bsm"
       } else {
         xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values
-        if (!"try-error" %in% class(xi_fill)) {
+        if (!inherits(xi_fill, "try-error")) {
           d<-as.numeric(differencing_fast(xi_fill, freq, mad = TRUE)$differences["order",1])
           if (d == 0){
             stsmodel_selected<-"noise"
@@ -333,15 +333,15 @@ estimateSTS <- function(x,
 
     if (outliers_i == "auto"){
       res_outliers<-try(tramo_outliers(xi)$model, silent = TRUE) # checking for outliers with missing values first
-      if (!"try-error" %in% class(res_outliers)) {
+      if (!inherits(res_outliers, "try-error")) {
         iv<-res_outliers$X
         if (ncol(iv) == 0) iv<-NULL
       } else {
         if (!exists("xi_fill")) xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values if too many of them
 
-        if (!"try-error" %in% class(xi_fill)) {
+        if (!inherits(xi_fill, "try-error")) {
           res_outliers<-try(tramo_outliers(xi_fill)$model, silent = TRUE)
-          if (!"try-error" %in% class(res_outliers)) {
+          if (!inherits(res_outliers, "try-error")) {
             iv<-res_outliers$X
             if (ncol(iv) == 0) iv<-NULL
           } else {
@@ -385,7 +385,7 @@ estimateSTS <- function(x,
         ## Easter
         easterreg<-create_easterreg(xi)
         t_pval<-try(easter_f(xi_fill, easterreg, regressors=cbind(regiv,regTD))$pvalue, silent = TRUE)
-        if (!"try-error" %in% class(t_pval)) {
+        if (!inherits(t_pval, "try-error")) {
           if (t_pval < .05){
             regeaster<-easterreg
           } else {
@@ -432,7 +432,7 @@ estimateSTS <- function(x,
     ## Run model
     res<-try(sts.run(xi_run, stsmodel = stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall), silent = TRUE)
 
-    if ("try-error" %in% class(res)) {
+    if (inherits(res, "try-error")) {
       warning(paste0(namei, ": The series could not be processed. It could be an initialization issue. Please check your input or ask for help if necessary."), call. = FALSE)
       out[[i]] <- list(NULL)
       names(out)[i] <- namei

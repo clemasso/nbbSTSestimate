@@ -307,7 +307,7 @@ is_seasonal <- function(x){
     f_pval<-try(seasonality_f(x_diff, frequency(x))$pvalue, silent=TRUE) # F-test on seasonal dummies
     friedman_pval<-try(seasonality_friedman(x_diff,frequency(x))$pvalue, silent=TRUE) # Friedman non-parametric test
 
-    test_succeeded<-c(!"try-error" %in% class(qs_pval), !"try-error" %in% class(f_pval), !"try-error" %in% class(friedman_pval))
+    test_succeeded<-c(!inherits(qs_pval, "try-error"), !inherits(f_pval, "try-error"), !inherits(friedman_pval, "try-error"))
     if (all(test_succeeded)){
       pvals<-c(qs_pval, f_pval, friedman_pval)
       include_seasonality<-fifelse(length(pvals[which(pvals < .05)])>=2, TRUE, FALSE)
@@ -742,7 +742,7 @@ clean_iv <- function(x, stsmodel, cumulator, cumulator.ratio, regressors, t_reg)
         break
       } else {
         res<-try(sts.run(x, stsmodel, cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors_cleaned), silent=TRUE)
-        if (!"try-error" %in% class(res)) {
+        if (!inherits(res, "try-error")) {
           regressors<-res$regressors$regressors
           t_reg<-res$regressors$tstat
         } else {
@@ -760,7 +760,7 @@ is_slope <- function(x, cumulator, cumulator.ratio, regressors){
 
   res_llt<-try(sts.run(x, stsmodel = "llt", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
 
-  if (!"try-error" %in% class(res_llt)) {
+  if (!inherits(res_llt, "try-error")) {
     constant_slope<-fifelse(var(res_llt$table[,"Slope"]) == 0,TRUE,FALSE)
     if (constant_slope){
       slope_est<-as.numeric(res_llt$table[1,"Slope"])
@@ -768,7 +768,7 @@ is_slope <- function(x, cumulator, cumulator.ratio, regressors){
       include_slope<-fifelse(abs(t)>1.96,TRUE,FALSE)
     } else {
       res_ll<-try(sts.run(x, stsmodel = "ll", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
-      if (!"try-error" %in% class(res_ll)) {
+      if (!inherits(res_ll, "try-error")) {
         ser_llt<-res_llt$likelihood$ser
         ser_ll<-res_ll$likelihood$ser
         include_slope<-fifelse(ser_llt<ser_ll,TRUE,FALSE)
@@ -790,7 +790,7 @@ is_trend <- function(x, cumulator, cumulator.ratio, regressors){
     res_ll<-try(sts.run(x, stsmodel = "ll", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
     res_noise<-try(sts.run(x, stsmodel = "noise", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
 
-    test_succeeded<-c(!"try-error" %in% class(res_llt), !"try-error" %in% class(res_ll), !"try-error" %in% class(res_noise))
+    test_succeeded<-c(!inherits(res_llt, "try-error"), !inherits(res_ll, "try-error"), !inherits(res_noise, "try-error"))
     if (all(test_succeeded)){
         ser_llt<-res_llt$likelihood$ser
         ser_ll<-res_ll$likelihood$ser
