@@ -216,7 +216,7 @@ handle_cal_effect_df <- function(x, cal.effect.df){
 
       ## check column content
       if (!all(cal.effect.df$cal.effect.td %in% c("Default", "WesternEU", "BE", "none"))) stop("Invalid calendar(s) in 'cal.effect.df'. Please check your input.")
-      if (any(is.na((as.logical(cal.effect.df$cal.effect.easter))))) stop("Invalid argument in 'cal.effect.df' for the easter effect. Must be TRUE or FALSE for each series. Please check your input.")
+      if (anyNA((as.logical(cal.effect.df$cal.effect.easter)))) stop("Invalid argument in 'cal.effect.df' for the easter effect. Must be TRUE or FALSE for each series. Please check your input.")
 
       ## check duplicates in series name
       series_names<-cal.effect.df$series_name
