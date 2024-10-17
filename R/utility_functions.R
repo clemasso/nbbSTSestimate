@@ -43,7 +43,7 @@ handle_stsmodel_df <- function(x, stsmodel.df){
       stsmodel.df<-data.frame(lapply(stsmodel.df, as.character), stringsAsFactors=FALSE)
 
       ## check if the stsmodel is valid
-      for(i in 1:nrow(stsmodel.df)){
+      for(i in seq_len(nrow(stsmodel.df))){
         if (!stsmodel.df[i,2] %in% c("auto", "bsm", "llt", "ll", "noise")){
           stsmodel.df[i,2]<-"auto"
           warning(paste0(stsmodel.df[i,1], ": the stsmodel submitted for this series is not valid. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise."), call. = FALSE)
@@ -154,7 +154,7 @@ handle_outliers_data <- function(x, outliers.data){
       yr<-substr(outliers,4,7)
       per<-substr(outliers,9,10)
 
-      for(i in 1:length(yr)){
+      for(i in seq_along(yr)){
         yri<-as.numeric(yr[i])
         peri<-as.numeric(per[i])
 
@@ -173,7 +173,7 @@ handle_outliers_data <- function(x, outliers.data){
         if (!all(freq_outliers=="M")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
       }
 
-      for(i in 1:length(outliers)){
+      for(i in seq_along(outliers)){
 
         outlier_decimal<-decimal_period(as.numeric(yr[i]),as.numeric(per[i]),frequency(x))
         pos<-which(time(x) == outlier_decimal)
