@@ -38,7 +38,7 @@ summary.nbb.estimateSTS.output<- function(x, ...){
   nx<-fifelse(is.null(ncol(x$x)), 1, ncol(x$x))
   if (!is.null(x$x.lf)){
     nxl<-fifelse(is.null(ncol(x$x.lf)), 1, ncol(x$x.lf))
-  } else{
+  } else {
     nxl<-0
   }
   cat(paste0("\nNumber of series: ", nx))
@@ -49,7 +49,7 @@ summary.nbb.estimateSTS.output<- function(x, ...){
   cat("\nModel:\n")
   if (nxl > 0){
     cat("Imputation using State Space models with cumulator (when low frequency data were submitted) \n")
-  } else{
+  } else {
     cat("Imputation using State Space models \n")
   }
 
@@ -79,7 +79,7 @@ plot.nbb.estimateSTS.output <- function(x, series_name = "", ...){
 
   if (!is.null(colnames(x$x))){
     x_init<-x$x[,series_name]
-  } else{
+  } else {
     x_init<-x$x
   }
 

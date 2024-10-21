@@ -37,8 +37,8 @@ Then,
 # Example
 
 ## Step 1: prepare input
-retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores, 
-                      BookStores=rjd3toolkit::retail$BookStores, 
+retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores,
+                      BookStores=rjd3toolkit::retail$BookStores,
                       ShoeStores=rjd3toolkit::retail$ShoeStores)
 
 x<-window(retail_extract, c(1990,1), c(2012,6), extend = TRUE)
@@ -49,7 +49,7 @@ outliers_input<-data.frame(series_name=c("GroceryStores", "GroceryStores", "Book
                            outliers=c("LS_2008M12", "AO_2002M04", "auto", "auto"))
 
 ## Step 2: run main function
-rslt <- estimateSTS(x, x.lf, stsmodel = "bsm", 
+rslt <- estimateSTS(x, x.lf, stsmodel = "bsm",
                  outliers = "userdefined",
                  outliers.df = outliers_input,
                  cal.effect = "auto",

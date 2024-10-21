@@ -115,22 +115,22 @@ estimateSTS <- function(x,
   # I.a. Input validation
 
   x<-convert_to_ts(x)
-  if(!is.null(x.lf)){
+  if (!is.null(x.lf)){
     x.lf<-convert_to_ts(x.lf)
   }
-  
-  if(!is.mts(x)){
-    if(!is.null(stsmodel.df)){
+
+  if (!is.mts(x)){
+    if (!is.null(stsmodel.df)){
       stsmodel <- stsmodel.df[1,2]
       stsmodel.df <- NULL
     }
-    if(!is.null(outliers.df)){
-      if(nrow(outliers.df) == 1){
+    if (!is.null(outliers.df)){
+      if (nrow(outliers.df) == 1){
         outliers <- outliers.df[1,2]
         outliers.df <- NULL
       }
     }
-    if(!is.null(cal.effect.df)){
+    if (!is.null(cal.effect.df)){
       cal.effect <- cal.effect.df[1,2]
       cal.effect.td <- cal.effect.df[1,3]
       cal.effect.easter <- cal.effect.df[1,4]
@@ -139,29 +139,29 @@ estimateSTS <- function(x,
   }
 
   stsmodel<-match.arg(stsmodel)
-  if(stsmodel == "mixed"){
+  if (stsmodel == "mixed"){
     stsmodel_df<-handle_stsmodel_df(x, stsmodel.df)
-  }else{
+  } else {
     stsmodel<-check_stsmodel(x, stsmodel)
   }
   outliers<-match.arg(outliers)
-  if(outliers == "userdefined"){
+  if (outliers == "userdefined"){
     iv_list<-handle_outliers_data(x, outliers.df)
   }
   cal.effect<-match.arg(cal.effect)
-  if(cal.effect == "mixed"){
+  if (cal.effect == "mixed"){
     cal_effect_df<-handle_cal_effect_df(x, cal.effect.df)
-  }else{
+  } else {
     cal.effect<-check_cal.effect(x, cal.effect)
   }
   cal.effect.td<-match.arg(cal.effect.td)
   stopifnot(is.logical(cal.effect.easter))
   conversion<-match.arg(conversion)
-  if(conversion == "Average"){
+  if (conversion == "Average"){
     x<-x/frequency(x)
   }
-  if(!is.null(path.xlsx)){
-    if(!file.exists(dirname(path.xlsx))) stop("Path xlsx not found!")
+  if (!is.null(path.xlsx)){
+    if (!file.exists(dirname(path.xlsx))) stop("Path xlsx not found!")
   }
 
   # I.b. Output initialization
@@ -169,10 +169,10 @@ estimateSTS <- function(x,
   out <- list()
   class(out) <- "nbb.estimateSTS.output"
 
-  if(is.null(ncol(x))){
+  if (is.null(ncol(x))){
     nr<-length(x)
     nc<-1
-  }else{
+  } else {
     nr<-nrow(x)
     nc<-ncol(x)
   }
@@ -189,19 +189,19 @@ estimateSTS <- function(x,
 
     # II.a. Select series
 
-    if(is.null(ncol(x))){
+    if (is.null(ncol(x))){
       namei<-fifelse(is.null(names(x)), "series", "names(x)")
       xi<-x
       xi_lf<-x.lf
-    }else{
+    } else {
       xi<-x[,i]
       namei<-colnames(x)[i]
-      if(is.null(x.lf)){
+      if (is.null(x.lf)){
         xi_lf<-NULL
-      }else{
-        if(colnames(x)[i] %in% colnames(x.lf)){
+      } else {
+        if (colnames(x)[i] %in% colnames(x.lf)){
           xi_lf<-x.lf[,colnames(x)[i]]
-        }else{
+        } else {
           xi_lf<-NULL
         }
       }
@@ -209,7 +209,7 @@ estimateSTS <- function(x,
 
     # II.b. Take the cumulative sum per LF period when xi.lf is provided
 
-    if(!is.null(xi_lf)){
+    if (!is.null(xi_lf)){
 
       xi_dt<-data.table(xi)
       xi_lf_dt<-data.table(xi_lf)
@@ -253,7 +253,7 @@ estimateSTS <- function(x,
       ## Deal with partially missing data on LF period(s)
       pmd_lf_dt<-xi_dt[!is.na(xi) & is.na(xic)]
 
-      if(nrow(pmd_lf_dt) > 0){
+      if (nrow(pmd_lf_dt) > 0){
         concerned_groups<-unique(pmd_lf_dt$group)
         processable<-TRUE
 
@@ -263,10 +263,10 @@ estimateSTS <- function(x,
             xi_dt[group == g, xicc_lead := shift(xicc,-1)]
             xi_dt[group == g & is.na(xicc) & !is.na(xi_lead) & !is.na(xicc_lead) , xicc := xicc_lead - xi_lead]
           }
-          if(nrow(xi_dt[group == g & (!is.na(xi_lead) & is.na(xicc))]) > 0) processable<-FALSE
+          if (nrow(xi_dt[group == g & (!is.na(xi_lead) & is.na(xicc))]) > 0) processable<-FALSE
         }
 
-        if(!processable){
+        if (!processable){
           warning(paste0(namei,": The series could not processed. This is because missing/non-missing data within some LF period are not regrouped and, therefore, cumulated data could not be computed. These cases cannot yet be handled."), call. = FALSE)
           out[[i]] <- list(NULL)
           names(out)[i] <- namei
@@ -280,7 +280,7 @@ estimateSTS <- function(x,
       cumulator<-TRUE
       ratio_hflf<-freq/freq_lf
 
-    }else{
+    } else {
       xi_run<- xi
       cumulator<-FALSE
       ratio_hflf<-NA
@@ -288,133 +288,133 @@ estimateSTS <- function(x,
 
     # II.c. Model selection
 
-    if(!is.null(stsmodel.df)){
+    if (!is.null(stsmodel.df)){
       stsmodel<-stsmodel_df[stsmodel_df$series_name == namei,]$stsmodel
     }
 
     auto_model<-fifelse(stsmodel == "auto", TRUE, FALSE)
 
-    if(auto_model){
-      if(is_seasonal(xi)){
+    if (auto_model){
+      if (is_seasonal(xi)){
         stsmodel_selected<-"bsm"
-      }else{
+      } else {
         xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values
-        if(!"try-error" %in% class(xi_fill)) {
+        if (!inherits(xi_fill, "try-error")) {
           d<-as.numeric(differencing_fast(xi_fill, freq, mad = TRUE)$differences["order",1])
-          if(d == 0){
+          if (d == 0){
             stsmodel_selected<-"noise"
-          }else if(d == 1){
+          } else if (d == 1){
             stsmodel_selected<-"ll"
-          }else if(d > 1){
+          } else if (d > 1){
             stsmodel_selected<-"llt"
           }
-        }else{
+        } else {
           stsmodel_selected<-"ll"
         }
       }
-    }else{
+    } else {
       stsmodel_selected<-stsmodel
     }
 
     # II.d. Outliers
-    
-    if(outliers == "userdefined"){
+
+    if (outliers == "userdefined"){
       iv_list_i <- iv_list[[namei]]
-      
-      if(is.ts(iv_list_i)){
+
+      if (is.ts(iv_list_i)){
         regiv <- iv_list_i
         outliers_i <- "userdefined"
-      }else{
+      } else {
         outliers_i <- iv_list_i
       }
-    }else{
+    } else {
       outliers_i <- outliers
     }
-    
-    if(outliers_i == "auto"){
+
+    if (outliers_i == "auto"){
       res_outliers<-try(tramo_outliers(xi)$model, silent = TRUE) # checking for outliers with missing values first
-      if(!"try-error" %in% class(res_outliers)) {
+      if (!inherits(res_outliers, "try-error")) {
         iv<-res_outliers$X
-        if(ncol(iv) == 0) iv<-NULL
-      }else{
-        if(!exists("xi_fill")) xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values if too many of them
-        
-        if(!"try-error" %in% class(xi_fill)) {
+        if (ncol(iv) == 0) iv<-NULL
+      } else {
+        if (!exists("xi_fill")) xi_fill<-try(ts_interpolate(xi, method="airline"), silent = TRUE) # quick filling of missing values if too many of them
+
+        if (!inherits(xi_fill, "try-error")) {
           res_outliers<-try(tramo_outliers(xi_fill)$model, silent = TRUE)
-          if(!"try-error" %in% class(res_outliers)) {
+          if (!inherits(res_outliers, "try-error")) {
             iv<-res_outliers$X
-            if(ncol(iv) == 0) iv<-NULL
-          }else{
+            if (ncol(iv) == 0) iv<-NULL
+          } else {
             iv<-NULL
             warning(paste0(namei, ": Outlier detection could not be performed due to the characteristics of the series. No outlier defined for this series."), call. = FALSE)
           }
-        }else{
+        } else {
           iv<-NULL
         }
       }
-      if(!is.null(iv)){
+      if (!is.null(iv)){
         outlier_variables<-res_outliers$variables[substr(res_outliers$variables,1,2) %in% c("AO","LS","TC","SO")]
         colnames(iv)<-outlier_variables
         iv<-ts(iv, start = start(xi), frequency = freq)
       }
       regiv<-iv
-    }else if(outliers_i == "none"){
+    } else if (outliers_i == "none"){
       regiv<-NULL
     }
 
     # II.e. Calendar effects
 
-    if(cal.effect == "mixed"){
+    if (cal.effect == "mixed"){
       cal_effect_df_i<-cal_effect_df[cal_effect_df$series_name == namei,]
       cal.effect<-cal_effect_df_i$cal.effect
       cal.effect.td<-cal_effect_df_i$cal.effect.td
       cal.effect.easter<-as.logical(cal_effect_df_i$cal.effect.easter)
     }
 
-    if(cal.effect == 'auto'){
+    if (cal.effect == 'auto'){
       if (freq > 4){
         xi_fill<-ts_interpolate(xi, method="airline") # quick filling of missing values
 
         ## TD
         f_pval<-td_f(xi_fill)$pvalue
-        if(f_pval < .05){
+        if (f_pval < .05){
           regTD<-create_htdreg(xi, type = cal.effect.td)
-        }else{
+        } else {
           regTD<-NULL
         }
         ## Easter
         easterreg<-create_easterreg(xi)
         t_pval<-try(easter_f(xi_fill, easterreg, regressors=cbind(regiv,regTD))$pvalue, silent = TRUE)
-        if(!"try-error" %in% class(t_pval)) {
-          if(t_pval < .05){
+        if (!inherits(t_pval, "try-error")) {
+          if (t_pval < .05){
             regeaster<-easterreg
-          }else{
+          } else {
             regeaster<-NULL
           }
-        }else{
+        } else {
           regeaster<-NULL
         }
         ## All
         regcal<-cbind(regTD, regeaster)
-      } else{
+      } else {
         regcal<-NULL
       }
-    }else if(cal.effect == "forced"){
-      if(!cal.effect.td == "none" & cal.effect.easter){
+    } else if (cal.effect == "forced"){
+      if (!cal.effect.td == "none" && cal.effect.easter){
         regTD<-create_htdreg(xi, cal.effect.td)
         regeaster<-create_easterreg(xi)
         regcal<-cbind(regTD, regeaster)
         colnames(regcal)<-c(paste0("CAL_",colnames(regTD)), "CAL_easter")
-      }else if(!cal.effect.td == "none"){
+      } else if (!cal.effect.td == "none"){
         regcal<-regTD<-create_htdreg(xi, cal.effect.td)
         colnames(regcal)<-paste0("CAL_",colnames(regTD))
-      }else if(cal.effect.easter){
+      } else if (cal.effect.easter){
         regcal<-regeaster<-create_easterreg(xi)
         colnames(regcal)<-"CAL_easter"
-      }else{
+      } else {
         regcal<-NULL
       }
-    }else if(cal.effect == "none"){
+    } else if (cal.effect == "none"){
       regcal<-NULL
     }
 
@@ -422,7 +422,7 @@ estimateSTS <- function(x,
 
     regall<-cbind(regiv,regcal)
 
-    if(!is.null(regall)){
+    if (!is.null(regall)){
       colnames(regall)<-c(colnames(regiv), colnames(regcal))
     }
 
@@ -432,7 +432,7 @@ estimateSTS <- function(x,
     ## Run model
     res<-try(sts.run(xi_run, stsmodel = stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall), silent = TRUE)
 
-    if("try-error" %in% class(res)) {
+    if (inherits(res, "try-error")) {
       warning(paste0(namei, ": The series could not be processed. It could be an initialization issue. Please check your input or ask for help if necessary."), call. = FALSE)
       out[[i]] <- list(NULL)
       names(out)[i] <- namei
@@ -443,71 +443,71 @@ estimateSTS <- function(x,
     # II.h. Tests of specification (+re-run automatic procedure with adjusted specification based on the results of the tests)
 
     ## On instrumental variables
-    if(!is.null(regiv)){
-      if(outliers == "auto"){
-        if(is_nonsignificant_iv(res)){
+    if (!is.null(regiv)){
+      if (outliers == "auto"){
+        if (is_nonsignificant_iv(res)){
           regall_cleaned<-clean_iv(xi_run, stsmodel_selected, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall, t_reg = res$regressors$tstat)
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
-        }else{
+        } else {
           regall_cleaned<-regall
         }
-      }else{
-        if(is_nonsignificant_iv(res)){
+      } else {
+        if (is_nonsignificant_iv(res)){
           regall_cleaned<-regall
           warning(paste0(namei, ": Some specified outliers are not significant."), call. = FALSE) # just a warning if not automatic procedure
         }
       }
-    }else{
+    } else {
       regall_cleaned<-regall
     }
 
     ## On model
-    if(stsmodel_selected == "bsm"){
-      if(!auto_model & !is_seasonal(xi)){
+    if (stsmodel_selected == "bsm"){
+      if (!auto_model && !is_seasonal(xi)){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
         warning(paste0(namei, ": A BSM model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
       }
-    }else if(stsmodel_selected == "llt"){
-      if(auto_model){
+    } else if (stsmodel_selected == "llt"){
+      if (auto_model){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
-        if(!include_slope){
+        if (!include_slope){
           stsmodel_selected<-"ll"
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
-        if(is_seasonal(xi)){
+      } else {
+        if (is_seasonal(xi)){
           warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(!is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if (!is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a Local level model might be more suited for this series."), call. = FALSE)
         }
       }
-    }else if(stsmodel_selected == "ll"){
-      if(auto_model){
+    } else if (stsmodel_selected == "ll"){
+      if (auto_model){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
-        if(include_slope){
+        if (include_slope){
           stsmodel_selected<-"llt"
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
-        if(is_seasonal(xi)){
+      } else {
+        if (is_seasonal(xi)){
           warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if (is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a Local Linear Trend model might be more suited for this series."), call. = FALSE)
         }
       }
-    }else if(stsmodel_selected == "noise"){
-      if(auto_model){
+    } else if (stsmodel_selected == "noise"){
+      if (auto_model){
         include_trend<-is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
-        if(include_trend){
+        if (include_trend){
           include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
           stsmodel_selected<-fifelse(include_slope, "llt","ll")
           res<-sts.run(xi_run, stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         }
-      }else{
-        if(is_seasonal(xi)){
+      } else {
+        if (is_seasonal(xi)){
           warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
-        }else if(is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
+        } else if (is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
           suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
           warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
@@ -517,9 +517,9 @@ estimateSTS <- function(x,
 
     # II.i. Rescale output when conversion = 'Average'
 
-    if(conversion == "Average"){
+    if (conversion == "Average"){
       res$table<-res$table*freq
-      if(!is.null(res$regressors)){
+      if (!is.null(res$regressors)){
         res$regressors$param<-res$regressors$param*freq
         res$regressors$param<-res$regressors$vparam*freq^2
       }
@@ -541,11 +541,11 @@ estimateSTS <- function(x,
   # III.a. Format the set of imputed series and rescale initial input when conversion = 'Average'
 
   x_imputed<-ts(x_imputed, start = start(x), end = end(x), frequency = freq)
-  if(conversion == "Average") x <- x*freq
+  if (conversion == "Average") x <- x*freq
 
   # III.b. Extract imputed series in an .xlsx file if requested
 
-  if(!is.null(path.xlsx)){
+  if (!is.null(path.xlsx)){
     wb <- createWorkbook()
     addWorksheet(wb, "imputed series")
     writeData(wb, "imputed series", data.frame(date=as.Date.yearmon(time(x_imputed)), x_imputed), startRow = 1, startCol = 1)
@@ -595,9 +595,9 @@ estimateSTS_fromXLSX <- function(path.data,
                                  path.output = NULL){
 
   x<-as.data.frame(read_excel(path.data, sheet = "x"))
-  if(is.lf){
+  if (is.lf){
     x.lf<-as.data.frame(read_excel(path.data, sheet = "x.lf"))
-  }else{
+  } else {
     x.lf<-NULL
   }
   stsmodel.df<-as.data.frame(read_excel(path.data, sheet = "stsmodel"))
